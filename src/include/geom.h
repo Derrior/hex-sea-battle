@@ -6,106 +6,43 @@
 struct point 
 {
     float x, y;
-    point()
-    {
-        x = y = 0;
-    }
-    point(float _x, float _y)
-    {
-        x = _x;
-        y = _y;
-    }
-    bool operator<(point& other)
-    {
-        return x < other.x or (x == other.x and y < other.y);
-    }
-    bool operator==(point& other)
-    {
-        return x == other.x and y == other.y;
-    }
+    point();
+    point(float _x, float _y);
+    point(int _x, int _y);
+    bool operator<(point& other);
+    bool operator==(point& other);
 };
 
 struct vec
 {
     float x, y;
-    vec()
-    {
-        x = y = 0;
-    }
-    vec(float _x, float _y)
-    {   
-        x = _x;
-        y = _y;
-    }
-    vec(point begin, point end)
-    {
-        x = end.x - begin.x;
-        y = end.y - begin.y;
-    }
+    vec();
+    vec(float _x, float _y);
+    vec(point begin, point end);
 
-    vec(vec& a)
-    {
-        x = a.x;
-        y = a.y;
-    }
+    vec(const vec& a);
 
-    double cross(vec& other)
-    {
-        return x * other.y - y * other.x;
-    }
+    double cross(vec& other);
     
-    double dot(vec& other)
-    {
-        return x * other.x + y * other.y;
-    }
+    double dot(vec& other);
 
-    bool operator == (vec& other)
-    {
-        return x == other.x and y == other.y;
-    }
+    bool operator == (vec& other);
 
-    bool operator < (vec& other)
-    {
-        return this->cross(other) > 0;
-    }
+    bool operator < (vec& other);
     
-    float len()
-    {
-        return sqrt(x * x + y * y);
-    }
+    float len();
 
-    vec operator* (float coeff)
-    {
-        vec res(*this);
-        res.x *= coeff;
-        res.y *= coeff;
-    }
+    vec operator* (float coeff);
     
-    vec resize(float len)
-    {
-        return (*this) * (len / (this->len()));
-    }
+    vec resize(float len);
 
-    vec rotate(float angle)
-    {
-        float cos = cos(angle), sin = sin(angle);
-        return vec(x * cos - y * sin, x * sin + y * cos);
-    }
-}
+    vec rotate(float angle);
+};
 
-point operator+ (point&a, vec& move)
-{
-    return point(a.x + move.x, a.y + move.y);
-}
+point operator+ (const point& a, const vec& move);
 
-point operator- (point&a, vec& move)
-{
-    return point(a.x - move.x, a.y - move.y);
-}
+point operator- (point&a, vec& move);
 
-point rotate(point& centre, point& p, float angle)
-{
-    return centre + vec(centre, p).rotate(angle);
-}
+point rotate(point& centre, point& p, float angle);
 
 #endif //GEOM
