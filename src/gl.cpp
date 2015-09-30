@@ -6,63 +6,38 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <file.h>
-
+#include <shader.h>
 using namespace std;
-GLuint vbo;
-typedef float* vec3f;
-GLuint create_shader(const char *filename, GLenum type) {
-    GLchar *source = read_file(filename);
-    if (source == NULL) {
-        fprintf(stderr, "Error while compiling shader %s: source cannot be read.\n", filename);
-        return -1;
+GLuint vbo, ibo_buffer;
+polygon* Field;
+int amount_of_polygons;
+int ibo_size;
+
+void to_float(float* arr, int& idx, point c)
+{
+    arr[idx] = c.x;
+    arr[idx + 1] = c.y;
+    idx += 2;
+}
+void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
+{
+    to_float(vbo_data, idx, p.centre);
+   
+    for (int i = 0; i < (int)p.points.size(); i++)
+    {
+        to_float(vbo_data, idx, p.points[i]);
     }
-    GLuint shader = glCreateShader(type);
-    const GLchar *sources[2] = {
-#ifdef GL_ES_VERSION_2_0
-        "#version 100\n"
-        "#define GLES2\n",
-#else
-        "#version 120\n",
-#endif
-        source
-    };
-    glShaderSource(shader, 2, sources, NULL);
-    free(source);
-    glCompileShader(shader);
-    GLint compile_status = GL_FALSE;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
-    if (compile_status == GL_FALSE) {
-        fprintf(stderr, "Error while compiling shader %s:\n", filename);
-        glDeleteShader(shader);
-        return -1;
+    idx -= (p.points.size() + 1) * 2;
+    idx >>= 1;
+    idx++;
+    for (int i = 0; i < (int)p.points.size(); i++)
+    {
+        ibo.push_back(idx - 1);
+        ibo.push_back(idx + i);
+        ibo.push_back(idx + (i + 1) % p.points.size());
     }
-    return shader;
 }
 
-GLuint create_program(GLuint vs, GLuint fs) {
-    GLuint prog = glCreateProgram();
-    glAttachShader(prog, vs);
-    glAttachShader(prog, fs);
-    glLinkProgram(prog);
-    GLint link_status = GL_FALSE;
-    glGetProgramiv(prog, GL_LINK_STATUS, &link_status);
-    if (link_status == GL_FALSE) {
-        fprintf(stderr, "Error while linking program:\n");
-        glDeleteProgram(prog);
-        return -1;
-    }
-    
-    GLint Success = GL_FALSE;
-    glValidateProgram(prog);
-    glGetProgramiv(prog, GL_VALIDATE_STATUS, &Success);
-    GLchar ErrLog[1024];
-    if (!Success) {
-        glGetProgramInfoLog(prog, sizeof(ErrLog), NULL, ErrLog);
-        fprintf(stderr, "Invalid shader program: '%s'\n", ErrLog);
-        exit(1);
-    }
-    return prog;
-}
 static void RenderSceneCB()
 {
     
@@ -70,7 +45,8 @@ static void RenderSceneCB()
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
+    glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
     glutSwapBuffers();
 }
@@ -78,7 +54,6 @@ static void RenderSceneCB()
 static void InitializeGlutCallbacks()
 {
     glutDisplayFunc(RenderSceneCB);
-//    glutIdleFunc(RenderSceneCB);
 }
 
 
@@ -91,25 +66,44 @@ void init_resourses()
 }
 static void CreateVertexBuffer()
 {
-    float points[6];
-    points[0] = 0.0f;
-    points[1] = 0.0f;
-    points[2] = 0.5f;
-    points[3] = 0.0f;
-    points[4] = 0.0f;
-    points[5] = 0.5f;
+
+    float points[14 * amount_of_polygons];
+    vector<int> ibo;
+    for (int i = 0; i < amount_of_polygons; i++)
+    {
+        draw_polygon(Field[i], points, i * 14, ibo);
+    }
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    unsigned int ibo_data[ibo.size()];
+    for (int i = 0; i < (int)ibo.size(); i++)
+        ibo_data[i] = ibo[i];
+    glGenBuffers(1, &ibo_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ibo_data), ibo_data, GL_STATIC_DRAW);
+    ibo_size = ibo.size();
+/*
+    float points[] = {0, -0.5, -0.5, 0, 0, 0.5, 0.5, 0};
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    unsigned int ibo_data[] = {0, 1, 2, 0, 2, 3};
+    glGenBuffers(1, &ibo_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ibo_data), ibo_data, GL_STATIC_DRAW);
+    */
 }
 
 int main(int argc, char** argv)
 {
+    Field = gen_field(10, 10);
+    amount_of_polygons = 100;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(1366, 768);
+    glutInitWindowPosition(0, 0);
     glutCreateWindow("Tutorial 01");
     InitializeGlutCallbacks();
     GLenum res = glewInit();
@@ -118,7 +112,7 @@ int main(int argc, char** argv)
         fprintf(stderr, "Error: %s\n", glewGetErrorString(res));
         return 1;
     }
-    glClearColor(0.0f, 1.0f, .0f, .0f);
+    glClearColor(0.0f, .5f, .0f, .0f);
 
     CreateVertexBuffer();
     init_resourses();

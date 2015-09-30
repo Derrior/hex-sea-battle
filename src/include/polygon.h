@@ -7,6 +7,7 @@
 
 struct polygon
 {
+    point centre;
     std::vector<point> points;
 };
 

@@ -6,6 +6,7 @@ using namespace std;
 polygon gen_cell(point centre)
 {
     polygon res;
+    res.centre = centre;
     point curr = centre + vec(-1, 0);
     for (int i = 0; i < 6; i++)
     {
