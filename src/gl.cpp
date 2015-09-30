@@ -51,6 +51,16 @@ GLuint create_program(GLuint vs, GLuint fs) {
         glDeleteProgram(prog);
         return -1;
     }
+    
+    GLint Success = GL_FALSE;
+    glValidateProgram(prog);
+    glGetProgramiv(prog, GL_VALIDATE_STATUS, &Success);
+    GLchar ErrLog[1024];
+    if (!Success) {
+        glGetProgramInfoLog(prog, sizeof(ErrLog), NULL, ErrLog);
+        fprintf(stderr, "Invalid shader program: '%s'\n", ErrLog);
+        exit(1);
+    }
     return prog;
 }
 static void RenderSceneCB()
@@ -81,16 +91,13 @@ void init_resourses()
 }
 static void CreateVertexBuffer()
 {
-    vec3f points[3];
-    points[0] = new float[2];
-    points[1] = new float[2];
-    points[2] = new float[2];
-    points[0][0] = 0.0f;
-    points[0][1] = 0.0f;
-    points[1][0] = 0.5f;
-    points[1][1] = 0.0f;
-    points[2][0] = 0.0f;
-    points[2][1] = 0.5f;
+    float points[6];
+    points[0] = 0.0f;
+    points[1] = 0.0f;
+    points[2] = 0.5f;
+    points[3] = 0.0f;
+    points[4] = 0.0f;
+    points[5] = 0.5f;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
