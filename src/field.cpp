@@ -11,7 +11,7 @@ polygon* gen_field(int w, int h)
     {
         for (int j = 0; j < h; j++)
         {
-            res[i * h + j] = gen_cell(point(j * 2, i * 2 + (j & 1)));
+            res[i * h + j] = gen_cell(point(j * 40, i * 40 + (j & 1) * 20));
         }
     }
     return res;
