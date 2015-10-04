@@ -37,30 +37,48 @@ void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
         ibo.push_back(idx + (i + 1) % p.points.size());
     }
 }
+void draw_hex(int idx)
+{
+    glBegin(GL_POLYGON);
+    glColor4d(122.0, 122.0, 122.0, 1);
+    for (int i = 0; i < (int)Field[idx].points.size(); i++)
+    {
+        glVertex2f(Field[idx].points[i].x, Field[idx].points[i].y);
+    }
+    glEnd();
+}
 
 static void RenderSceneCB()
 {
-    
     glClear(GL_COLOR_BUFFER_BIT);
+    draw_hex(0);
+    /*
+    glClearColor(0.0, 0.5, 0.0, 1);    
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
+    */
     glutSwapBuffers();
 }
-        
+ 
+/*void Pointer(int x, int y)
+{
+    
+}*/
 static void InitializeGlutCallbacks()
 {
     glutDisplayFunc(RenderSceneCB);
+//    glutPassiveMotionFunc(Pointer);
 }
 
 
 void init_resourses()
 {
     GLuint vs = create_shader("shader/vertex.glsl", GL_VERTEX_SHADER);
-    GLuint fs = create_shader("shader/fragment.glsl", GL_FRAGMENT_SHADER);
+    GLuint fs = create_shader("shader/dummy_fragment.glsl", GL_FRAGMENT_SHADER);
     GLuint program = create_program(vs, fs);
     glUseProgram(program);
 }
@@ -114,7 +132,7 @@ int main(int argc, char** argv)
     }
     glClearColor(0.0f, .5f, .0f, .0f);
 
-    CreateVertexBuffer();
+//    CreateVertexBuffer();
     init_resourses();
     glutMainLoop();
     return 0;
