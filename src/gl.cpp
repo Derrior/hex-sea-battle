@@ -1,64 +1,44 @@
-#include <geom.h>
-#include <math_3d.h>
-#include <polygon.h>
-#include <field.h>
-#include <cstdio>
-#include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <file.h>
+#include <math_3d.h>
+#include <polygon.h>
 #include <shader.h>
+#include <iostream>
+#include <field.h>
+#include <geom.h>
+#include <cstdio>
+#include <file.h>
+#include <ship.h>
+#include <gl.h>
 using namespace std;
-GLuint vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld, program;
+unsigned int vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld, program;
 polygon* Field;
 Matrix3f World;
 int amount_of_polygons;
 int ibo_size;
-#define D_X 5
+ship* ships;
+int amount_of_ships;
+int curr_ship;
 void PressEvent(unsigned char key, int x, int y) {
     if (key == 'w') {
-        World.m[5] += D_X;
+        ships[curr_ship].pos.m[5] += D_X;
     } else if (key == 's') {
-        World.m[5] -= D_X;
+        ships[curr_ship].pos.m[5] -= D_X;
     } else if (key == 'a') {
-        World.m[2] -= D_X; 
+        ships[curr_ship].pos.m[2] -= D_X; 
     } else if (key == 'd') {
-        World.m[2] += D_X;
+        ships[curr_ship].pos.m[2] += D_X;
     }
-    cout << World.m[2] << endl;
 }
 
 void PressSpecial(int key, int x, int y) {
     if (key == GLUT_KEY_RIGHT) {
-        World *= 1.01;
+        curr_ship ^= 1;
     } else if (key == GLUT_KEY_LEFT) {
-        World /= 1.01;
+        curr_ship ^= 1;
     }
 }
 
-void to_float(float* arr, int& idx, point c)
-{
-    arr[idx] = c.x;
-    arr[idx + 1] = c.y;
-    idx += 2;
-}
-void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
-{
-    to_float(vbo_data, idx, p.centre);
-    int was_idx = idx;
-   
-    for (int i = 0; i < (int)p.points.size(); i++)
-    {
-        to_float(vbo_data, idx, p.points[i]);
-    }
-    idx = was_idx / 2;
-    for (int i = 0; i < (int)p.points.size(); i++)
-    {
-        ibo.push_back(idx - 1);
-        ibo.push_back(idx + i);
-        ibo.push_back(idx + (i + 1) % p.points.size());
-    }
-}
 void draw_hex(int idx)
 {
     glBegin(GL_POLYGON);
@@ -72,7 +52,7 @@ void draw_hex(int idx)
 
 static void RenderSceneCB()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //    draw_hex(0);
 //    /*
     glClearColor(0.0, 0.5, 0.0, 1);   
@@ -84,7 +64,24 @@ static void RenderSceneCB()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //    */
+    for (int i = 0; i < amount_of_ships; i++) {
+        glUniformMatrix3fv(gWorld, 1, GL_TRUE, &ships[i].pos.m[0]);
+        glUniform3f(glGetUniformLocation(program, "f_color"), 1, 0.5, 1);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, ship_ibo_size, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glDisableVertexAttribArray(0);
+
+    }
     glutSwapBuffers();
 }
  
@@ -137,35 +134,10 @@ static void CreateVertexBuffer()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ibo_data), ibo_data, GL_STATIC_DRAW);
     ibo_size = ibo.size();
-    float small[14];
-    ibo.clear();
-    draw_polygon(Field[0], small, 0, ibo);
-    glGenBuffers(1, &small_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, small_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-    unsigned int small_ibo_data[ibo.size()];
-    /*
-    for (int i = 0; i < 14 * amount_of_polygons; i += 2) {
-        cout << '(' << points[i] << "; " << points[i + 1] << ')' << endl;
-    }
-    */
-    for (int i = 0; i < (int)ibo.size(); i++) {
-        small_ibo_data[i] = ibo[i];
-    }
-    glGenBuffers(1, &small_ibo_buffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, small_ibo_buffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(small_ibo_data), small_ibo_data, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    ships = new ship[2];
+    amount_of_ships = 2;
 
-/*
-    float points[] = {0, -0.5, -0.5, 0, 0, 0.5, 0.5, 0};
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-    unsigned int ibo_data[] = {0, 1, 2, 0, 2, 3};
-    glGenBuffers(1, &ibo_buffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ibo_data), ibo_data, GL_STATIC_DRAW);
-    */
 }
 
 int main(int argc, char** argv)
@@ -186,8 +158,10 @@ int main(int argc, char** argv)
         return 1;
     }
     glClearColor(0.0f, .5f, .0f, .0f);
+    init_ship();
 
     CreateVertexBuffer();
+    cout << "created" << endl;
     init_resourses();
     glutMainLoop();
     return 0;
