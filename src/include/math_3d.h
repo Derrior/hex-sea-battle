@@ -1,6 +1,12 @@
 #ifndef MATH_3D_H
 #define	MATH_3D_H
 
+struct Matrix3f {
+    float m[9];
+    Matrix3f() {
+        m[0] = m[4] = m[8] = 1;
+    }
+};
 
 struct Vector3f
 {
