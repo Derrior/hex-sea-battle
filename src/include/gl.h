@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <file.h>
 
-#define D_X 10
+#define D_X 1
 
 extern unsigned int vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld, program;
 #endif //GL_H

@@ -57,7 +57,7 @@ static void RenderSceneCB()
 //    /*
     glClearColor(0.0, 0.5, 0.0, 1);   
     glUniformMatrix3fv(gWorld, 1, GL_TRUE, &World.m[0]);
-    glUniform3f(glGetUniformLocation(program, "f_color"), 0, 0, 1);
+    glUniform4f(glGetUniformLocation(program, "f_color"), 0, 0, 1, 1);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -69,7 +69,7 @@ static void RenderSceneCB()
 //    */
     for (int i = 0; i < amount_of_ships; i++) {
         glUniformMatrix3fv(gWorld, 1, GL_TRUE, &ships[i].pos.m[0]);
-        glUniform3f(glGetUniformLocation(program, "f_color"), 1, 0.5, 1);
+        glUniform4f(glGetUniformLocation(program, "f_color"), 1, 0.5, 1, 1);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);

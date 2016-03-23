@@ -1,5 +1,5 @@
-uniform vec3 f_color;
+uniform vec4 f_color;
 
 void main(void) {
-    gl_FragColor.rgba = vec4(f_color, 1) / 2;
+    gl_FragColor.rgba = f_color / 2;
 }
