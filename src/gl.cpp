@@ -9,18 +9,31 @@
 #include <file.h>
 #include <shader.h>
 using namespace std;
-GLuint vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld;
+GLuint vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld, program;
 polygon* Field;
 Matrix3f World;
 int amount_of_polygons;
 int ibo_size;
-
+#define D_X 5
 void PressEvent(unsigned char key, int x, int y) {
-    World.m[2] += 100;
+    if (key == 'w') {
+        World.m[5] += D_X;
+    } else if (key == 's') {
+        World.m[5] -= D_X;
+    } else if (key == 'a') {
+        World.m[2] -= D_X; 
+    } else if (key == 'd') {
+        World.m[2] += D_X;
+    }
     cout << World.m[2] << endl;
 }
 
 void PressSpecial(int key, int x, int y) {
+    if (key == GLUT_KEY_RIGHT) {
+        World *= 1.01;
+    } else if (key == GLUT_KEY_LEFT) {
+        World /= 1.01;
+    }
 }
 
 void to_float(float* arr, int& idx, point c)
@@ -63,7 +76,8 @@ static void RenderSceneCB()
 //    draw_hex(0);
 //    /*
     glClearColor(0.0, 0.5, 0.0, 1);   
-    glUniformMatrix3fv(gWorld, 1, GL_FALSE, &World.m[0]);
+    glUniformMatrix3fv(gWorld, 1, GL_TRUE, &World.m[0]);
+    glUniform3f(glGetUniformLocation(program, "f_color"), 0, 0, 1);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -83,6 +97,7 @@ static void InitializeGlutCallbacks()
     glutDisplayFunc(RenderSceneCB);
     glutIdleFunc(RenderSceneCB);
     glutKeyboardFunc(&PressEvent);
+    glutSpecialFunc(PressSpecial);
 //    glutPassiveMotionFunc(Pointer);
 }
 
@@ -91,7 +106,7 @@ void init_resourses()
 {
     GLuint vs = create_shader("shader/vertex.glsl", GL_VERTEX_SHADER);
     GLuint fs = create_shader("shader/fragment.glsl", GL_FRAGMENT_SHADER);
-    GLuint program = create_program(vs, fs);
+    program = create_program(vs, fs);
     glUseProgram(program);
     gWorld = glGetUniformLocation(program, "World");
 }

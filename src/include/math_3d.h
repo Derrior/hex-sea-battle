@@ -6,6 +6,19 @@ struct Matrix3f {
     Matrix3f() {
         m[0] = m[4] = m[8] = 1;
     }
+    void operator *=(const float& mod) {
+        for (int i = 0; i < 9; i++) {
+            m[i] *= mod;
+        }
+    }
+    void operator /=(const float& mod) {
+        if (mod == 0) {
+            return;
+        }
+        for (int i = 0; i < 9; i++) {
+            m[i] /= mod;
+        }
+    }
 };
 
 struct Vector3f
