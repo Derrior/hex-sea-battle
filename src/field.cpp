@@ -11,10 +11,18 @@ polygon* gen_field(int w, int h)
     {
         for (int j = 0; j < h; j++)
         {
-            res[i * h + j] = gen_cell(point(j * 46 + 150, i * 52 + (j & 1) * 26 + 200));
+            res[i * h + j] = gen_cell(point(j * 46, i * 52 + (j & 1) * 26));
         }
     }
     return res;
+}
+polygon* gen_ship(int w) {
+    polygon* res = new polygon[w];
+    for (int i = 0; i < w; i++) {
+        res[i] = gen_cell(point(0, i * 52));
+    }
+    return res;
+    
 }
 
 void to_float(float* arr, int& idx, point c)

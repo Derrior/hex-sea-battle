@@ -22,7 +22,7 @@ struct vec
 
     vec(const vec& a);
 
-    double cross(vec& other);
+    double cross(const vec& other);
     
     double dot(vec& other);
 

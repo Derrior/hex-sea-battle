@@ -12,4 +12,5 @@ struct polygon
 };
 
 polygon gen_cell(point centre);
+bool in_polygon(point a, polygon& b);
 #endif //POLYGON_H_

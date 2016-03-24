@@ -11,7 +11,8 @@
 #include <ship.h>
 #include <gl.h>
 using namespace std;
-unsigned int vbo, ibo_buffer, small_vbo, small_ibo_buffer, gWorld, program;
+unsigned int vbo, ibo_buffer, program;
+unsigned int f_color_loc, world_loc, coord_loc, angle_loc;
 polygon* Field;
 Matrix3f World;
 int amount_of_polygons;
@@ -19,6 +20,15 @@ int ibo_size;
 ship* ships;
 int amount_of_ships;
 int curr_ship;
+float matrixes[6][4];
+void init_matrixes() {
+    for (int i = 0; i < 6; i++) {
+        matrixes[i][0] = matrixes[i][3] = cosf(i * (M_PI / 3));
+        matrixes[i][1] = -sinf(i * (M_PI / 3));
+        matrixes[i][2] = -matrixes[i][1];
+    }
+}
+
 void PressEvent(unsigned char key, int x, int y) {
     if (key == 'w') {
         ships[curr_ship].pos.m[5] += D_X;
@@ -28,6 +38,32 @@ void PressEvent(unsigned char key, int x, int y) {
         ships[curr_ship].pos.m[2] -= D_X; 
     } else if (key == 'd') {
         ships[curr_ship].pos.m[2] += D_X;
+    } else if (key == 'c') {
+        y = 768 - y;
+        for (int i = 0; i < amount_of_polygons; i++) {
+            if (in_polygon(point(x, y), Field[i])) {
+                x = Field[i].centre.x;
+                y = Field[i].centre.y;
+            }
+        }
+        ships[curr_ship].pos.m[2] = x;
+        ships[curr_ship].pos.m[5] = y;
+    }
+
+}
+
+void MouseEvent(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
+        y = 768 - y;
+        for (int i = 0; i < amount_of_polygons; i++) {
+            if (in_polygon(point(x, y), Field[i])) {
+                x = Field[i].centre.x;
+                y = Field[i].centre.y;
+            }
+        }
+        ships[curr_ship].pos.m[2] = x;
+        ships[curr_ship].pos.m[5] = y;
+    
     }
 }
 
@@ -36,6 +72,8 @@ void PressSpecial(int key, int x, int y) {
         curr_ship ^= 1;
     } else if (key == GLUT_KEY_LEFT) {
         curr_ship ^= 1;
+    } else if (key == GLUT_KEY_UP) {
+        ships[curr_ship].rotate();
     }
 }
 
@@ -53,23 +91,21 @@ void draw_hex(int idx)
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    draw_hex(0);
-//    /*
     glClearColor(0.0, 0.5, 0.0, 1);   
-    glUniformMatrix3fv(gWorld, 1, GL_TRUE, &World.m[0]);
-    glUniform4f(glGetUniformLocation(program, "f_color"), 0, 0, 1, 1);
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+    glUniform4f(f_color_loc, 0, 0, 1, 1);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//    */
+    
     for (int i = 0; i < amount_of_ships; i++) {
-        glUniformMatrix3fv(gWorld, 1, GL_TRUE, &ships[i].pos.m[0]);
-        glUniform4f(glGetUniformLocation(program, "f_color"), 1, 0.5, 1, 1);
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[i].pos.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[i].rot][0]);
+        glUniform4f(f_color_loc, 1, 0.5, 1, 1);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -77,11 +113,10 @@ static void RenderSceneCB()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, ship_ibo_size, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glDisableVertexAttribArray(0);
 
     }
+    
     glutSwapBuffers();
 }
  
@@ -95,6 +130,7 @@ static void InitializeGlutCallbacks()
     glutIdleFunc(RenderSceneCB);
     glutKeyboardFunc(&PressEvent);
     glutSpecialFunc(PressSpecial);
+    glutMouseFunc(MouseEvent);
 //    glutPassiveMotionFunc(Pointer);
 }
 
@@ -105,7 +141,10 @@ void init_resourses()
     GLuint fs = create_shader("shader/fragment.glsl", GL_FRAGMENT_SHADER);
     program = create_program(vs, fs);
     glUseProgram(program);
-    gWorld = glGetUniformLocation(program, "World");
+    world_loc = glGetUniformLocation(program, "World");
+    f_color_loc = glGetUniformLocation(program, "f_color");
+    angle_loc = glGetUniformLocation(program, "rotate");
+
 }
 
 
@@ -158,7 +197,8 @@ int main(int argc, char** argv)
         return 1;
     }
     glClearColor(0.0f, .5f, .0f, .0f);
-    init_ship();
+    init_matrixes();
+    init_ship_object();
 
     CreateVertexBuffer();
     cout << "created" << endl;

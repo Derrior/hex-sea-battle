@@ -44,7 +44,7 @@ vec::vec(const vec& a)
         y = a.y;
     }
 
-double vec::cross(vec& other)
+double vec::cross(const vec& other)
     {
         return x * other.y - y * other.x;
     }
