@@ -3,6 +3,8 @@
 
 using namespace std;
 
+#define CONST_X 45
+#define CONST_Y 52
 
 polygon* gen_field(int w, int h)
 {
@@ -11,7 +13,7 @@ polygon* gen_field(int w, int h)
     {
         for (int j = 0; j < h; j++)
         {
-            res[i * h + j] = gen_cell(point(j * 46, i * 52 + (j & 1) * 26));
+            res[i * h + j] = gen_cell(point(j * CONST_X, i * CONST_Y + (j & 1) * CONST_Y / 2));
         }
     }
     return res;
@@ -19,7 +21,7 @@ polygon* gen_field(int w, int h)
 polygon* gen_ship(int w) {
     polygon* res = new polygon[w];
     for (int i = 0; i < w; i++) {
-        res[i] = gen_cell(point(0, i * 52));
+        res[i] = gen_cell(point(0, i * sqrt(3) * 29 + i * 2));
     }
     return res;
     
