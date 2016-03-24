@@ -5,7 +5,7 @@ using namespace std;
 
 unsigned int ship_vbo, ship_ibo;
 unsigned int ship_ibo_size;
-float ship_vbo_data[SHIP_SIZE];
+float ship_vbo_data[SHIP_SIZE * 5];
 unsigned int* ship_ibo_data;
 void init_ship_object() {
     

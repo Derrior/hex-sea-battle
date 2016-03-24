@@ -111,7 +111,7 @@ static void RenderSceneCB()
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, ship_ibo_size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, ships[i].ibo_size, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glDisableVertexAttribArray(0);
 
@@ -176,7 +176,7 @@ static void CreateVertexBuffer()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     ships = new ship[2];
     amount_of_ships = 2;
-
+    ships[1].power(4);
 }
 
 int main(int argc, char** argv)
