@@ -2,7 +2,7 @@ APP=app
 SRCDIR=src
 OBJDIR=obj
 SUFFIXES=.c .cpp .s
-LIBS=m GL GLEW freetype glut
+LIBS=m GL GLU GLEW freetype glut
 RELEASEOPTS=-O2
 DEBUGOPTS=-ggdb -DDEBUG
 
@@ -15,7 +15,7 @@ CFLAGS=-std=c11 -march=native -pipe $(if $(DEBUG),$(DEBUGOPTS),$(RELEASEOPTS)) -
 CXX=g++
 CXXFLAGS=-std=c++11 -march=native -pipe $(if $(DEBUG),$(DEBUGOPTS),$(RELEASEOPTS)) -Wall -Wextra -Wshadow $(foreach inc,$(INCLUDEDIRS), -I$(inc)) -I/usr/include/freetype2
 LD=g++
-LDFLAGS=$(if $(DEBUG),$(DEBUGOPTS),$(RELEASEOPTS)) $(addprefix -l,$(LIBS))
+LDFLAGS=$(if $(DEBUG),$(DEBUGOPTS),$(RELEASEOPTS))
 
 SRCS=$(foreach subd,$(SUBDIRS),$(foreach suf,$(SUFFIXES),$(wildcard $(subd)/*$(suf))))
 HEADERS=$(foreach subd,$(INCLUDEDIRS),$(shell find $(subd) -regex '.*\.h'))
@@ -25,7 +25,7 @@ OBJS=$(foreach subd,$(SUBDIRS),$(foreach suf,$(SUFFIXES),$(subst $(SRCDIR),$(OBJ
 all: $(APP)
 
 $(APP): $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -o $@
+	$(LD) $(LDFLAGS) $(OBJS) -o $@ $(addprefix -l,$(LIBS))
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS) Makefile | $(OBJSUBDIRS)
 	$(CC) $(CFLAGS) -c $< -o $@
