@@ -11,12 +11,13 @@
 #include <ship.h>
 #include <gl.h>
 
-#define WINDOW_WIDTH 1366
-#define WINDOW_HEIGHT 768
+int WINDOW_WIDTH;
+int WINDOW_HEIGHT;
 #define CONST_SPEED_CAMERA 20
 
 
 using namespace std;
+
 unsigned int vbo, ibo_buffer, program;
 unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc;
 polygon* Field;
@@ -33,6 +34,8 @@ float matrixes[6][4];
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {1, 0.5, 0, 1};
 float bomb_color[] = {1, 0, 0, 1};
 bool window_should_close = false;
+int cnt;
+
 void init_matrixes() {
     for (int i = 0; i < 6; i++) {
         matrixes[i][0] = matrixes[i][3] = cosf(i * (M_PI / 3));
@@ -77,6 +80,8 @@ void PressEvent(unsigned char key, int x, int y) {
         Camera.m[2] = min(50.0f, World.m[2]);
     } else if (key == 27) {
         glutDestroyWindow(1);
+    } else if (key == 13) {
+        field2.bombs.push_back(cnt++);
     }
 
 }
@@ -316,6 +321,9 @@ int main(int argc, char** argv)
     glutInitWindowSize(1366, 768);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Tutorial 01");
+    WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
+    WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
+
     InitializeGlutCallbacks();
     GLenum res = glewInit();
     if (res != GLEW_OK)
