@@ -2,6 +2,7 @@
 #define SHIP_H
 
 #include <math_3d.h>
+#include <geom.h>
 #define SHIP_SIZE 18
 extern unsigned int ship_vbo, ship_ibo, ship_ibo_size;
 extern float ship_vbo_data[SHIP_SIZE * 5];
@@ -24,5 +25,6 @@ struct ship {
     void power(int i) {
         ibo_size = SHIP_SIZE * i;
     }
+    bool in_ship(point a);
 };
 #endif //SHIP_H

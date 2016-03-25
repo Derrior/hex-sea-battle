@@ -45,4 +45,5 @@ point operator- (point&a, vec& move);
 
 point rotate(point& centre, point& p, float angle);
 
+bool in_triangle(point a, point* triangle);
 #endif //GEOM

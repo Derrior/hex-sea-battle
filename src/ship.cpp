@@ -31,4 +31,17 @@ void init_ship_object() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ship_ibo_size * sizeof(unsigned int), ship_ibo_data, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+bool ship::in_ship(point p) {
+    p.x -= pos.m[2];
+    p.y -= pos.m[5];
+    for (int i = 0; i < ibo_size; i += 3) {
+        point triangle[] = {point(ship_vbo_data[ship_ibo_data[i] * 2], ship_vbo_data[ship_ibo_data[i] * 2 + 1]),
+                         point(ship_vbo_data[ship_ibo_data[i + 1] * 2], ship_vbo_data[ship_ibo_data[i + 1] * 2 + 1]),
+                         point(ship_vbo_data[ship_ibo_data[i + 2] * 2], ship_vbo_data[ship_ibo_data[i + 2] * 2 + 1])};
+        if (in_triangle(p, triangle)) {
+            return true;
+        }
+    }
+    return false;
+}
 

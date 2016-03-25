@@ -50,3 +50,5 @@ void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
         ibo.push_back(idx + (i + 1) % p.points.size());
     }
 }
+
+

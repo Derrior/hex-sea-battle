@@ -27,8 +27,11 @@ int ibo_size;
 ship* ships;
 int amount_of_ships;
 int curr_ship;
+field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float matrixes[6][4];
+float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {1, 0.5, 0, 1};
+float bomb_color[] = {1, 0, 0, 1};
 bool window_should_close = false;
 void init_matrixes() {
     for (int i = 0; i < 6; i++) {
@@ -38,20 +41,20 @@ void init_matrixes() {
     }
 }
 
-void set_ship(int& x, int& y) {
-    y = 768 - y;
-    x -= Camera.m[2];
-    y -= Camera.m[5];
+void set_ship(int& x, int& y, field& F) {
     for (int i = 0; i < amount_of_polygons; i++) {
-        if (in_polygon(point(x - World.m[2], y - World.m[5]), Field[i])) {
-            x = Field[i].centre.x + World.m[2];
-            y = Field[i].centre.y + World.m[5];
+        if (in_polygon(point(x - F.move.m[2], y - F.move.m[5]), Field[i])) {
+            x = Field[i].centre.x + F.move.m[2];
+            y = Field[i].centre.y + F.move.m[5];
         }
     }
 }
 
 
 void PressEvent(unsigned char key, int x, int y) {
+    y = 768 - y;
+    x -= Camera.m[2];
+    y -= Camera.m[5];
     if (key == 'w') {
         ships[curr_ship].pos.m[5] += D_X;
     } else if (key == 's') {
@@ -61,7 +64,7 @@ void PressEvent(unsigned char key, int x, int y) {
     } else if (key == 'd') {
         ships[curr_ship].pos.m[2] += D_X;
     } else if (key == 'c') {
-        set_ship(x, y);
+        set_ship(x, y, field1);
         ships[curr_ship].pos.m[2] = x;
         ships[curr_ship].pos.m[5] = y;
 
@@ -84,10 +87,22 @@ void PressEvent(unsigned char key, int x, int y) {
 */
 
 void MouseEvent(int button, int state, int x, int y) {
+    y = 768 - y;
+    x -= Camera.m[2];
+    y -= Camera.m[5];
     if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
-        set_ship(x, y);
-        ships[curr_ship].pos.m[2] = x;
-        ships[curr_ship].pos.m[5] = y;
+        if (curr_ship == -1) {
+            for (int i = 0; i < amount_of_ships; i++) {
+                if (ships[i].in_ship(point(x, y))) {
+                    curr_ship = i;
+                }
+            }
+        } else {
+            set_ship(x, y, field1);
+            ships[curr_ship].pos.m[2] = x;
+            ships[curr_ship].pos.m[5] = y;
+            curr_ship = -1;
+        }
     }
 }
 
@@ -134,13 +149,39 @@ void draw_hex(int idx)
     glEnd();
 }
 
-static void RenderSceneCB()
-{
-    PassiveMotionEvent(mouse_x, mouse_y);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.5, 0.0, 1);
+static void draw_cell(int cell_idx, const float* color, field& F) {
+        World.m[2] = F.move.m[2] + Field[cell_idx].centre.x;
+        World.m[5] = F.move.m[5] + Field[cell_idx].centre.y;
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+        glUniform4fv(f_color_loc, 1, color);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDisableVertexAttribArray(0);
+}
+
+static void draw_ship(int ship_idx, const float* color) {
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[ship_idx].pos.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[ship_idx].rot][0]);
+        glUniform4fv(f_color_loc, 1, color);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, ships[ship_idx].ibo_size, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDisableVertexAttribArray(0);
+}
+
+static void draw_field(field& F) {
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &F.move.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
     glUniform4f(f_color_loc, 0, 0, 1, 1);
     glEnableVertexAttribArray(0);
@@ -149,33 +190,32 @@ static void RenderSceneCB()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
+}
+
+static void draw_bombs(field& F) {
+    for (int i = 0; i < (int)F.bombs.size(); i++) {
+        draw_cell(F.bombs[i], bomb_color, F);
+    }
+
+}
+
+
+static void RenderSceneCB()
+{
+    PassiveMotionEvent(mouse_x, mouse_y);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.5, 0.0, 1);
+    draw_field(field1);
+    draw_field(field2);
     
     for (int i = 0; i < amount_of_ships; i++) {
-        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[i].pos.m[0]);
-        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[i].rot][0]);
-        glUniform4f(f_color_loc, 1, 0.5, 1, 1);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, ships[i].ibo_size, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableVertexAttribArray(0);
-
+        draw_ship(i, ship_color);
     }
-    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[curr_ship].pos.m[0]);
-    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[curr_ship].rot][0]);
-    glUniform4f(f_color_loc, 1, 0.5, 0, 1);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-    glDrawElements(GL_TRIANGLES, ships[curr_ship].ibo_size, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDisableVertexAttribArray(0);
-    
+    if (curr_ship != -1) {
+        draw_ship(curr_ship, current_ship_color);
+    }
+    draw_bombs(field1);
+    draw_bombs(field2);
     glutSwapBuffers();
 }
  
@@ -237,14 +277,33 @@ static void CreateVertexBuffer()
     ships = new ship[10];
     amount_of_ships = 10;
     ships[0].power(4);
-    for (int i = 1; i < 3; i++)
+    ships[0].pos.m[2] = 500;
+    ships[0].pos.m[5] = 300;
+    for (int i = 1; i < 3; i++) {
         ships[i].power(3);
-    for (int i = 3; i < 6; i++)
+        ships[i].pos.m[2] = 600;
+        ships[i].pos.m[5] = 300 + (i - 1) * 180;
+    }
+
+    for (int i = 3; i < 6; i++) {
         ships[i].power(2);
-    for (int i = 6; i < 10; i++)
+        ships[i].pos.m[2] = 700;
+        ships[i].pos.m[5] = 300 + (i - 3) * 120;
+    }
+    for (int i = 6; i < 10; i++) {
         ships[i].power(1);
+        ships[i].pos.m[2] = 800;
+        ships[i].pos.m[5] = 300 + (i - 6) * 60;
+    }
     //glutSetCursor(0, 0);
 }
+
+void init_fields() {
+    field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
+    field2.move.m[2] = 860;
+    field1.bombs.push_back(12);
+}
+
 
 int main(int argc, char** argv)
 {
@@ -267,6 +326,7 @@ int main(int argc, char** argv)
     glClearColor(0.0f, .5f, .0f, .0f);
     init_matrixes();
     init_ship_object();
+    init_fields();
 
     CreateVertexBuffer();
     cout << "created" << endl;
