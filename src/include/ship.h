@@ -9,7 +9,7 @@ extern float ship_vbo_data[SHIP_SIZE * 5];
 extern float matrixes[6][4];
 
 void init_ship_object();
-
+void create_ships();
 struct ship {
     Matrix3f pos;
     int rot;

@@ -3,6 +3,7 @@
 #include <background.h>
 #include <math_3d.h>
 #include <polygon.h>
+#include <drawing.h>
 #include <shader.h>
 #include <iostream>
 #include <field.h>
@@ -19,7 +20,7 @@ int WINDOW_HEIGHT;
 
 using namespace std;
 
-unsigned int vbo, ibo_buffer, program;
+unsigned int vbo, ibo_buffer, program, menu;
 unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc;
 polygon* Field;
 Matrix3f World;
@@ -83,8 +84,7 @@ void PressEvent(unsigned char key, int x, int y) {
         glutDestroyWindow(1);
     } else if (key == 13) {
         field2.bombs.push_back(cnt++);
-    }
-
+    } 
 }
 /*
 0 1 2
@@ -140,8 +140,12 @@ void PressSpecial(int key, int x, int y) {
         curr_ship += amount_of_ships - 1;
     } else if (key == GLUT_KEY_UP) {
         ships[curr_ship].rotate();
-    } 
+    }
     curr_ship %= amount_of_ships;
+}
+
+void PressMenu(int v) {
+    cout << v << endl;
 }
 
 void draw_hex(int idx)
@@ -155,87 +159,10 @@ void draw_hex(int idx)
     glEnd();
 }
 
-static void draw_cell(int cell_idx, const float* color, field& F) {
-        World.m[2] = F.move.m[2] + Field[cell_idx].centre.x;
-        World.m[5] = F.move.m[5] + Field[cell_idx].centre.y;
-        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
-        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform4fv(f_color_loc, 1, color);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableVertexAttribArray(0);
-}
-
-static void draw_cell(int cell_idx) {
-        World.m[2] = bg.arr[cell_idx].centre.x;
-        World.m[5] = bg.arr[cell_idx].centre.y;
-        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
-        glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform4fv(f_color_loc, 1, &colors[bg.color_idx[cell_idx]].c[0]);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableVertexAttribArray(0);
-    
-}
-
-static void draw_background() {
-    glUniform1f(scale_loc, BACKGROUND_CELL_RAD);
-    Camera.m[2] /= 2;
-    Camera.m[5] /= 2;
-    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    for (int i = 0; i < (int)bg.arr.size(); i++) {
-        draw_cell(i);
-        
-    }
-    Camera.m[2] *= 2;
-    Camera.m[5] *= 2;
-    glUniform1f(scale_loc, 1);
-}
-
-static void draw_ship(int ship_idx, const float* color) {
-        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[ship_idx].pos.m[0]);
-        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[ship_idx].rot][0]);
-        glUniform4fv(f_color_loc, 1, color);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, ships[ship_idx].ibo_size, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableVertexAttribArray(0);
-}
-
-static void draw_field(field& F) {
-    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &F.move.m[0]);
-    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    glUniform4f(f_color_loc, 0, 0.1, .6, 1);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
-    glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
-    glDisableVertexAttribArray(0);
-}
-
-
-static void draw_bombs(field& F) {
-    for (int i = 0; i < (int)F.bombs.size(); i++) {
-        draw_cell(F.bombs[i], bomb_color, F);
-    }
-
+static void init_menu() {
+    menu = glutCreateMenu(PressMenu);
+    glutAddMenuEntry("Press", 1);
+    glutAddMenuEntry("NOPress", 2);
 }
 
 
@@ -287,7 +214,7 @@ void init_resourses()
     angle_loc = glGetUniformLocation(program, "rotate");
     camera_loc = glGetUniformLocation(program, "camera");
     f_color_loc = glGetUniformLocation(program, "f_color");
-
+    //init_menu();
 }
 
 
@@ -304,11 +231,6 @@ static void CreateVertexBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
     unsigned int ibo_data[ibo.size()];
-    /*
-    for (int i = 0; i < 14 * amount_of_polygons; i += 2) {
-        cout << '(' << points[i] << "; " << points[i + 1] << ')' << endl;
-    }
-    */
     for (int i = 0; i < (int)ibo.size(); i++) {
         ibo_data[i] = ibo[i];
     }
@@ -317,27 +239,7 @@ static void CreateVertexBuffer()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ibo_data), ibo_data, GL_STATIC_DRAW);
     ibo_size = ibo.size();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    ships = new ship[10];
-    amount_of_ships = 10;
-    ships[0].power(4);
-    ships[0].pos.m[2] = 500;
-    ships[0].pos.m[5] = 300;
-    for (int i = 1; i < 3; i++) {
-        ships[i].power(3);
-        ships[i].pos.m[2] = 600;
-        ships[i].pos.m[5] = 300 + (i - 1) * 180;
-    }
-
-    for (int i = 3; i < 6; i++) {
-        ships[i].power(2);
-        ships[i].pos.m[2] = 700;
-        ships[i].pos.m[5] = 300 + (i - 3) * 120;
-    }
-    for (int i = 6; i < 10; i++) {
-        ships[i].power(1);
-        ships[i].pos.m[2] = 800;
-        ships[i].pos.m[5] = 300 + (i - 6) * 60;
-    }
+    create_ships();
     //glutSetCursor(0, 0);
 }
 

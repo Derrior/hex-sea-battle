@@ -50,4 +50,26 @@ bool ship::in_ship(point p) {
     swap(matrixes[rot][1], matrixes[rot][2]);
     return false;
 }
+void create_ships() {
+    ships = new ship[10];
+    amount_of_ships = 10;
+    ships[0].power(4);
+    ships[0].pos.m[2] = 500;
+    ships[0].pos.m[5] = 300;
+    for (int i = 1; i < 3; i++) {
+        ships[i].power(3);
+        ships[i].pos.m[2] = 600;
+        ships[i].pos.m[5] = 300 + (i - 1) * 180;
+    }
 
+    for (int i = 3; i < 6; i++) {
+        ships[i].power(2);
+        ships[i].pos.m[2] = 700;
+        ships[i].pos.m[5] = 300 + (i - 3) * 120;
+    }
+    for (int i = 6; i < 10; i++) {
+        ships[i].power(1);
+        ships[i].pos.m[2] = 800;
+        ships[i].pos.m[5] = 300 + (i - 6) * 60;
+    }
+}
