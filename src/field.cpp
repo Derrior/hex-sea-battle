@@ -6,14 +6,14 @@ using namespace std;
 #define CONST_X 45
 #define CONST_Y 52
 
-polygon* gen_field(int w, int h)
+polygon* gen_field(int w, int h, int scale)
 {
     polygon* res = new polygon[w * h];
     for (int i = 0; i < w; i++)
     {
         for (int j = 0; j < h; j++)
         {
-            res[i * h + j] = gen_cell(point(j * CONST_X, i * CONST_Y + (j & 1) * CONST_Y / 2));
+            res[i * h + j] = gen_cell(point(j * CONST_X * scale, scale * (i * CONST_Y + (j & 1) * CONST_Y / 2)));
         }
     }
     return res;

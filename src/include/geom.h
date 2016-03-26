@@ -18,6 +18,7 @@ struct vec
     float x, y;
     vec();
     vec(float _x, float _y);
+    vec(point a);
     vec(point begin, point end);
 
     vec(const vec& a);
@@ -32,11 +33,15 @@ struct vec
     
     float len();
 
+    point get_point();
+
     vec operator* (float coeff);
     
     vec resize(float len);
 
     vec rotate(float angle);
+
+    vec rotate(float* mat);
 };
 
 point operator+ (const point& a, const vec& move);

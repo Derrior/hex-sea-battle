@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <background.h>
 #include <math_3d.h>
 #include <polygon.h>
 #include <shader.h>
@@ -19,7 +20,7 @@ int WINDOW_HEIGHT;
 using namespace std;
 
 unsigned int vbo, ibo_buffer, program;
-unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc;
+unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc;
 polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
@@ -30,11 +31,11 @@ int amount_of_ships;
 int curr_ship;
 field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
-float matrixes[6][4];
-float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {1, 0.5, 0, 1};
+float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0, 1, 0, 1};
 float bomb_color[] = {1, 0, 0, 1};
 bool window_should_close = false;
 int cnt;
+background bg;
 
 void init_matrixes() {
     for (int i = 0; i < 6; i++) {
@@ -170,6 +171,33 @@ static void draw_cell(int cell_idx, const float* color, field& F) {
         glDisableVertexAttribArray(0);
 }
 
+static void draw_cell(int cell_idx) {
+        World.m[2] = bg.arr[cell_idx].centre.x;
+        World.m[5] = bg.arr[cell_idx].centre.y;
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+        glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+        glUniform4fv(f_color_loc, 1, &colors[bg.color_idx[cell_idx]].c[0]);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDisableVertexAttribArray(0);
+    
+}
+
+static void draw_background() {
+    glUniform1f(scale_loc, BACKGROUND_CELL_RAD);
+    for (int i = 0; i < (int)bg.arr.size(); i++) {
+        draw_cell(i);
+        
+    }
+    glUniform1f(scale_loc, 1);
+}
+
 static void draw_ship(int ship_idx, const float* color) {
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &ships[ship_idx].pos.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[ships[ship_idx].rot][0]);
@@ -188,7 +216,7 @@ static void draw_field(field& F) {
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniformMatrix3fv(world_loc, 1, GL_TRUE, &F.move.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    glUniform4f(f_color_loc, 0, 0, 1, 1);
+    glUniform4f(f_color_loc, 0, 0.1, .6, 1);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -196,6 +224,7 @@ static void draw_field(field& F) {
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
 }
+
 
 static void draw_bombs(field& F) {
     for (int i = 0; i < (int)F.bombs.size(); i++) {
@@ -207,9 +236,12 @@ static void draw_bombs(field& F) {
 
 static void RenderSceneCB()
 {
+    WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
+    WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.5, 0.0, 1);
+    glClearColor(0.5, 0.5, 0.5, 1);
+    draw_background();
     draw_field(field1);
     draw_field(field2);
     
@@ -245,10 +277,11 @@ void init_resourses()
     GLuint fs = create_shader("shader/fragment.glsl", GL_FRAGMENT_SHADER);
     program = create_program(vs, fs);
     glUseProgram(program);
-    camera_loc = glGetUniformLocation(program, "camera");
     world_loc = glGetUniformLocation(program, "World");
-    f_color_loc = glGetUniformLocation(program, "f_color");
+    scale_loc = glGetUniformLocation(program, "scale");
     angle_loc = glGetUniformLocation(program, "rotate");
+    camera_loc = glGetUniformLocation(program, "camera");
+    f_color_loc = glGetUniformLocation(program, "f_color");
 
 }
 
@@ -312,7 +345,7 @@ void init_fields() {
 
 int main(int argc, char** argv)
 {
-    Field = gen_field(10, 10);
+    Field = gen_field(10, 10, 1);
     amount_of_polygons = 100;
     World.m[2] = -100;
     World.m[5] = -100;
@@ -321,9 +354,9 @@ int main(int argc, char** argv)
     glutInitWindowSize(1366, 768);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Tutorial 01");
+
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
-
     InitializeGlutCallbacks();
     GLenum res = glewInit();
     if (res != GLEW_OK)
@@ -331,11 +364,11 @@ int main(int argc, char** argv)
         fprintf(stderr, "Error: %s\n", glewGetErrorString(res));
         return 1;
     }
-    glClearColor(0.0f, .5f, .0f, .0f);
+    glClearColor(0.5f, .5f, .5f, .5f);
     init_matrixes();
     init_ship_object();
     init_fields();
-
+    init_colors();
     CreateVertexBuffer();
     cout << "created" << endl;
     init_resourses();

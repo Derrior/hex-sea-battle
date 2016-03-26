@@ -3,11 +3,11 @@
 
 using namespace std;
 
-polygon gen_cell(point centre)
+polygon gen_cell(point centre, float rad)
 {
     polygon res;
     res.centre = centre;
-    point curr = centre + vec(-29, 0);
+    point curr = centre + vec(-rad, 0);
     for (int i = 0; i < 6; i++)
     {
         curr = rotate(centre, curr, M_PI / 3);
