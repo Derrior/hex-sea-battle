@@ -200,7 +200,7 @@ static void draw_background() {
     }
     Camera.m[2] *= 2;
     Camera.m[5] *= 2;
-    glUniform1f(scale_loc, 100);
+    glUniform1f(scale_loc, 1);
 }
 
 static void draw_ship(int ship_idx, const float* color) {
