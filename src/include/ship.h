@@ -25,6 +25,12 @@ struct ship {
             rot = 0;
         }
     }
+    void unrotate() {
+        rot--;
+        if (rot == -1) {
+            rot = 5;
+        }
+    }
     void power(int i) {
         ibo_size = SHIP_SIZE * i;
         strength = i;

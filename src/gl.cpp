@@ -141,6 +141,8 @@ void PressSpecial(int key, int x, int y) {
         curr_ship += amount_of_ships - 1;
     } else if (key == GLUT_KEY_UP) {
         ships[curr_ship].rotate();
+    } else if (key == GLUT_KEY_DOWN) {
+        ships[curr_ship].unrotate();
     }
     curr_ship %= amount_of_ships;
 }
@@ -181,11 +183,11 @@ static void RenderSceneCB()
     for (int i = 0; i < amount_of_ships; i++) {
         draw_ship(i, ship_color);
     }
+    draw_bombs(field1);
+    draw_bombs(field2);
     if (curr_ship != -1) {
         draw_ship(curr_ship, current_ship_color);
     }
-    draw_bombs(field1);
-    draw_bombs(field2);
     glutSwapBuffers();
 }
  
