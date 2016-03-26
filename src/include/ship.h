@@ -14,6 +14,7 @@ struct ship {
     Matrix3f pos;
     int rot;
     int ibo_size;
+    int strength;
     ship(int i = 1) {
         rot = 0;
         ibo_size = SHIP_SIZE * i;
@@ -26,7 +27,9 @@ struct ship {
     }
     void power(int i) {
         ibo_size = SHIP_SIZE * i;
+        strength = i;
     }
+    point get_point(int j);
     bool in_ship(point a);
 };
 #endif //SHIP_H

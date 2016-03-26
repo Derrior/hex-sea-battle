@@ -50,6 +50,12 @@ bool ship::in_ship(point p) {
     swap(matrixes[rot][1], matrixes[rot][2]);
     return false;
 }
+
+point ship::get_point(int j) {
+    return point(pos.m[2], pos.m[5]) + (vec(0, 45) * j).rotate(matrixes[rot]);
+
+}
+
 void create_ships() {
     ships = new ship[10];
     amount_of_ships = 10;

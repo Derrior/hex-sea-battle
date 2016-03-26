@@ -6,6 +6,7 @@
 #include <drawing.h>
 #include <shader.h>
 #include <iostream>
+#include <engine.h>
 #include <field.h>
 #include <geom.h>
 #include <cstdio>
@@ -83,7 +84,7 @@ void PressEvent(unsigned char key, int x, int y) {
     } else if (key == 27) {
         glutDestroyWindow(1);
     } else if (key == 13) {
-        field2.bombs.push_back(cnt++);
+        check(field1, ships);
     } 
 }
 /*
