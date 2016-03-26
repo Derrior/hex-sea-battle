@@ -249,7 +249,7 @@ static void CreateVertexBuffer()
 void init_fields() {
     field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
     field2.move.m[2] = 860;
-    field1.bombs.push_back(12);
+    field1.bombs.push_back(19);
 }
 
 

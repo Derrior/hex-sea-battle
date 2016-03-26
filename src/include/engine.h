@@ -25,19 +25,21 @@ bool check(field& r, ship* b) {
                         r.bombs.push_back(k);
                     }
                     //std::cout << i << ' ' << j << ' ' << k << " (" << curr_centre.x << "; " << curr_centre.y << ")\n";
+                    //std::cout << k << std::endl;
                     used[k] = i;
-                    may_be_near[i] = false;
+                    may_be_near[k] = false;
                 }
             }
-            vec neighbour(0, 29);
+            vec neighbour(0, 45);
             for (int m = 0; m < 6; m++) {
                 point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
                 for (int k = 0; k < amount_of_polygons; k++) {
                     if (in_polygon(curr_neighbour, Field[k])) {
-                        if (!may_be_near[k] and used[k] != j) {
+                        if (!may_be_near[k] and used[k] != i) {
                             r.bombs.push_back(k);
                         }
-                        //std::cout << i << ' ' << j << ' ' << k << " (" << curr_centre.x << "; " << curr_centre.y << ")\n";
+                        //std::cout << i << ' ' << j << ' ' << k << " (" << curr_neighbour.x << "; " << curr_neighbour.y << ")" << 
+                        //    Field[k].centre.x << ' ' << Field[k].centre.y << "\n";
                         used[k] = i;
                     }
             }
