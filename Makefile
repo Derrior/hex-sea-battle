@@ -2,7 +2,7 @@ APP=app
 SRCDIR=src
 OBJDIR=obj
 SUFFIXES=.c .cpp .s
-LIBS=m GL GLU GLEW freetype glut
+LIBS=m GL GLU GLEW freetype glut SDL2
 RELEASEOPTS=-O2
 DEBUGOPTS=-ggdb -DDEBUG
 
