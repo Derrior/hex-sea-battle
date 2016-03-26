@@ -36,7 +36,7 @@ field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0, 1, 0, 1};
 float bomb_color[] = {1, 0, 0, 1};
-bool window_should_close = false;
+bool window_should_close = false, play_audio = true;
 int cnt;
 background bg;
 
@@ -172,7 +172,9 @@ static void init_menu() {
 
 static void RenderSceneCB()
 {
-    SDL_Delay(1);
+    if (play_audio) {
+        SDL_Delay(1);
+    }
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
@@ -260,16 +262,17 @@ int main(int argc, char** argv)
     sdl_init();
     SDL_AudioSpec wav_spec;
     if (!SDL_LoadWAV("sum.wav", &wav_spec, &wav_buffer,&wav_length)) {
-        return 1;
+        play_audio = false;;
     };
-    wav_spec.callback = my_audio_callback;
-    wav_spec.userdata = NULL;
-    audio_pos = wav_buffer;
-    audio_len = wav_length;
+    if (play_audio) {
+        wav_spec.callback = my_audio_callback;
+        wav_spec.userdata = NULL;
+        audio_pos = wav_buffer;
+        audio_len = wav_length;
 
-    SDL_OpenAudio(&wav_spec, NULL);
-    SDL_PauseAudio(0);
-
+        SDL_OpenAudio(&wav_spec, NULL);
+        SDL_PauseAudio(0);
+    }
     Field = gen_field(10, 10, 1);
     amount_of_polygons = 100;
     World.m[2] = -100;
