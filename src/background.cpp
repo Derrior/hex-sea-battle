@@ -22,10 +22,12 @@ void init_colors() {
 }
 
 background::background() {
-    polygon* F = gen_field(10, 10, BACKGROUND_CELL_RAD);
-    arr.resize(100);
-    for (int i = 0; i < 100; i++) {
+    polygon* F = gen_field(20, 20, BACKGROUND_CELL_RAD);
+    arr.resize(400);
+    for (int i = 0; i < 400; i++) {
         arr[i] = F[i];
+        arr[i].centre.x -= 500;
+        arr[i].centre.y -= 500;
         color_idx.push_back(get_rand(0, 10));
     }
 }

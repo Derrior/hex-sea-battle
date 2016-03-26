@@ -122,13 +122,13 @@ void PassiveMotionEvent(int x, int y) {
         Camera.m[2] -= CONST_SPEED_CAMERA * (x - 3 * WINDOW_WIDTH / 4)  / 1000;
     }
     if (y < WINDOW_HEIGHT / 16) {
-        Camera.m[5] -= CONST_SPEED_CAMERA * (WINDOW_HEIGHT / 4 - y) / 1000;
+        Camera.m[5] -= CONST_SPEED_CAMERA * (WINDOW_HEIGHT / 4 - y) / 500;
     }
     if (y > WINDOW_HEIGHT * 15 / 16) {
-        Camera.m[5] += CONST_SPEED_CAMERA * (y - 3 * WINDOW_HEIGHT / 4)  / 1000;
+        Camera.m[5] += CONST_SPEED_CAMERA * (y - 3 * WINDOW_HEIGHT / 4)  / 500;
     }
-    Camera.m[2] = max(0.0f, Camera.m[2]);
-    Camera.m[5] = max(0.0f, Camera.m[5]);
+    Camera.m[2] = max(-500.0f, Camera.m[2]);
+    Camera.m[5] = max(-500.0f, Camera.m[5]);
     mouse_x = x;
     mouse_y = y;
 }
@@ -191,11 +191,16 @@ static void draw_cell(int cell_idx) {
 
 static void draw_background() {
     glUniform1f(scale_loc, BACKGROUND_CELL_RAD);
+    Camera.m[2] /= 2;
+    Camera.m[5] /= 2;
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     for (int i = 0; i < (int)bg.arr.size(); i++) {
         draw_cell(i);
         
     }
-    glUniform1f(scale_loc, 1);
+    Camera.m[2] *= 2;
+    Camera.m[5] *= 2;
+    glUniform1f(scale_loc, 100);
 }
 
 static void draw_ship(int ship_idx, const float* color) {
