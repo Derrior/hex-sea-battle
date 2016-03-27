@@ -30,7 +30,7 @@ extern ship* ships;
 extern field field1, field2;
 extern int mouse_x, mouse_y;
 extern float ship_color[], current_ship_color[];
-extern float bomb_color[];
+extern float bomb_color[], aqua_color[];
 extern int cnt;
 extern background bg;
 #endif //GL_H

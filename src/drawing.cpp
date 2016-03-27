@@ -84,5 +84,8 @@ void draw_bombs(field& F) {
     for (int i = 0; i < (int)F.bombs.size(); i++) {
         draw_cell(F.bombs[i], bomb_color, F);
     }
+    for (int i = 0; i < (int)F.aqua.size(); i++) {
+        draw_cell(F.aqua[i], aqua_color, F);
+    }
 }
 

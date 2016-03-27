@@ -35,8 +35,8 @@ int curr_ship;
 field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0, 1, 0, 1};
-float bomb_color[] = {1, 0, 0, 1};
-bool window_should_close = false, play_audio = true;
+float bomb_color[] = {1, 0, 0, 1}, aqua_color[] = {0.5, 0.5, 0.5, 1};
+bool window_should_close = false, play_audio = true, turning = false;
 int cnt;
 background bg;
 
@@ -86,7 +86,9 @@ void PressEvent(unsigned char key, int x, int y) {
         glutDestroyWindow(1);
     } else if (key == 13) {
         check(field1, ships);
-    } 
+    } else if (key == ' ') {
+        turning = true;
+    }
 }
 /*
 0 1 2
@@ -98,20 +100,29 @@ void MouseEvent(int button, int state, int x, int y) {
     y = 768 - y;
     x -= Camera.m[2];
     y -= Camera.m[5];
-    if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
-        if (curr_ship == -1) {
-            for (int i = 0; i < amount_of_ships; i++) {
-                if (ships[i].in_ship(point(x, y))) {
-                    curr_ship = i;
+    if (!turning) {
+        if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
+            if (curr_ship == -1) {
+                for (int i = 0; i < amount_of_ships; i++) {
+                    if (ships[i].in_ship(point(x, y))) {
+                        curr_ship = i;
+                    }
                 }
+            } else {
+                set_ship(x, y, field1);
+                ships[curr_ship].pos.m[2] = x;
+                ships[curr_ship].pos.m[5] = y;
+                curr_ship = -1;
             }
-        } else {
-            set_ship(x, y, field1);
-            ships[curr_ship].pos.m[2] = x;
-            ships[curr_ship].pos.m[5] = y;
-            curr_ship = -1;
+        }
+    } else {
+        if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
+            x -= field1.move.m[2];
+            y -= field1.move.m[5];
+            turn(x, y, field1, ships);
         }
     }
+    
 }
 
 void PassiveMotionEvent(int x, int y) {

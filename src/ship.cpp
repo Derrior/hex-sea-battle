@@ -1,6 +1,7 @@
 #include <gl.h>
 #include <ship.h>
 #include <field.h>
+#include <engine.h>
 using namespace std;
 
 unsigned int ship_vbo, ship_ibo;
@@ -39,13 +40,14 @@ bool ship::in_ship(point p) {
     swap(matrixes[rot][1], matrixes[rot][2]);
     p = vec(p).rotate(matrixes[rot]).get_point();
     for (int i = 0; i < ibo_size; i += 3) {
-        point triangle[] = {point(ship_vbo_data[ship_ibo_data[i] * 2], ship_vbo_data[ship_ibo_data[i] * 2 + 1]),
-                         point(ship_vbo_data[ship_ibo_data[i + 1] * 2], ship_vbo_data[ship_ibo_data[i + 1] * 2 + 1]),
-                         point(ship_vbo_data[ship_ibo_data[i + 2] * 2], ship_vbo_data[ship_ibo_data[i + 2] * 2 + 1])};
+        point* triangle;
+        get_triangle(i, triangle);
         if (in_triangle(p, triangle)) {
             swap(matrixes[rot][1], matrixes[rot][2]);
+            delete[] triangle;
             return true;
         }
+        delete[] triangle;
     }
     swap(matrixes[rot][1], matrixes[rot][2]);
     return false;

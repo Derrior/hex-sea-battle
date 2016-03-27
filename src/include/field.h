@@ -11,5 +11,6 @@ void draw_polygon(polygon& p, float* vbo_data, int idx, std::vector<int>& ibo);
 struct field {
     Matrix3f move;
     std::vector<int> bombs;
+    std::vector<int> aqua;
 };
 #endif //FIELD_H_

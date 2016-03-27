@@ -6,6 +6,7 @@
 #define SHIP_SIZE 18
 extern unsigned int ship_vbo, ship_ibo, ship_ibo_size;
 extern float ship_vbo_data[SHIP_SIZE * 5];
+extern unsigned int* ship_ibo_data;
 extern float matrixes[6][4];
 
 void init_ship_object();
