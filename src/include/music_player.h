@@ -20,7 +20,7 @@ int sdl_init() {
     return SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 }
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len) {
+void my_audio_callback(void *, Uint8 *stream, int len) {
     
     if (audio_len == 0) {
         audio_pos = wav_buffer;

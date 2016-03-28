@@ -150,15 +150,15 @@ void PassiveMotionEvent(int x, int y) {
     mouse_y = y;
 }
 
-void PressSpecial(int key, int x, int y) {
+void PressSpecial(int key, int, int) {
     if (key == GLUT_KEY_RIGHT) {
         curr_ship += 1;
     } else if (key == GLUT_KEY_LEFT) {
         curr_ship += amount_of_ships - 1;
     } else if (key == GLUT_KEY_UP) {
-        ships[curr_ship].rotate();
-    } else if (key == GLUT_KEY_DOWN) {
         ships[curr_ship].unrotate();
+    } else if (key == GLUT_KEY_DOWN) {
+        ships[curr_ship].rotate();
     }
     curr_ship %= amount_of_ships;
 }
@@ -177,12 +177,13 @@ void draw_hex(int idx)
     }
     glEnd();
 }
-
+/*
 static void init_menu() {
     menu = glutCreateMenu(PressMenu);
     glutAddMenuEntry("Press", 1);
     glutAddMenuEntry("NOPress", 2);
 }
+*/
 
 
 static void RenderSceneCB()
