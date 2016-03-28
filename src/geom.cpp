@@ -15,12 +15,16 @@ point::point(int _x, int _y)
     y = _y;
 }
 
+std::ostream& operator<<(std::ostream& a, const point& b) {
+    a << "(" << b.x << "; " << b.y << ") ";
+    return a;
+}
 
-bool point:: operator<(point& other)
+bool point:: operator<(const point& other)
 {
     return x < other.x or (x == other.x and y < other.y);
 }
-bool point:: operator==(point& other)
+bool point:: operator==(const point& other)
 {
     return x == other.x and y == other.y;
 }
@@ -61,17 +65,17 @@ double vec::cross(const vec& other)
     return x * other.y - y * other.x;
 }
     
-double vec::dot(vec& other)
+double vec::dot(const vec& other)
 {
     return x * other.x + y * other.y;
 }
 
-bool vec::operator == (vec& other)
+bool vec::operator == (const vec& other)
 {
     return x == other.x and y == other.y;
 }
 
-bool vec::operator < (vec& other)
+bool vec::operator < (const vec& other)
 {
     return this->cross(other) > 0;
 }
@@ -110,12 +114,12 @@ point operator+ (const point& a, const vec& move)
     return point(a.x + move.x, a.y + move.y);
 }
 
-point operator- (point&a, vec& move)
+point operator- (const point&a, const vec& move)
 {
     return point(a.x - move.x, a.y - move.y);
 }
 
-point rotate(point& centre, point& p, float angle)
+point rotate(const point& centre, const point& p, float angle)
 {
     return centre + vec(centre, p).rotate(angle);
 }

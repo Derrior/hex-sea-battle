@@ -1,7 +1,8 @@
 #ifndef GEOM
 #define GEOM
 
-#include <cmath>
+#include <math.h>
+#include <iostream>
 
 struct point 
 {
@@ -9,9 +10,11 @@ struct point
     point();
     point(float _x, float _y);
     point(int _x, int _y);
-    bool operator<(point& other);
-    bool operator==(point& other);
+    bool operator<(const point& other);
+    bool operator==(const point& other);
 };
+
+std::ostream& operator<<(std::ostream& a, const point& b); 
 
 struct vec
 {
@@ -25,11 +28,11 @@ struct vec
 
     double cross(const vec& other);
     
-    double dot(vec& other);
+    double dot(const vec& other);
 
-    bool operator == (vec& other);
+    bool operator == (const vec& other);
 
-    bool operator < (vec& other);
+    bool operator < (const vec& other);
     
     float len();
 
@@ -46,9 +49,9 @@ struct vec
 
 point operator+ (const point& a, const vec& move);
 
-point operator- (point&a, vec& move);
+point operator- (const point&a, const vec& move);
 
-point rotate(point& centre, point& p, float angle);
+point rotate(const point& centre, const point& p, float angle);
 
 bool in_triangle(point a, point* triangle);
 #endif //GEOM
