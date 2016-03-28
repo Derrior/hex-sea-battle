@@ -19,6 +19,7 @@ struct field {
 
     field(int am) {
         used = new bool[am];
+        memset(used, 0, am);
     }
 };
 #endif //FIELD_H_
