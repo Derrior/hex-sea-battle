@@ -99,11 +99,11 @@ bool turn(int x, int y, field& r, ship* b) {
                         vec neighbour(0, 45.1);
                         for (int ship_cell = 0; ship_cell < b[i].strength; ship_cell++) {
                             point curr_centre = vec(point(r.move.m[2], r.move.m[5]), b[i].get_point(ship_cell)).get_point();
-                            cout << curr_centre << endl;
+                            //cout << curr_centre << endl;
                             for (int m = 0; m < 6; m++) {
                                 point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
                                 int cell_idx = get_cell_idx(curr_neighbour);
-                                cout << curr_neighbour << cell_idx << endl;
+                                //cout << curr_neighbour << cell_idx << endl;
                                 if (!used[cell_idx]) {
                                     r.aqua.push_back(cell_idx);
                                 }
