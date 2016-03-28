@@ -12,5 +12,13 @@ struct field {
     Matrix3f move;
     std::vector<int> bombs;
     std::vector<int> aqua;
+    bool* used;
+    field() {
+        used = NULL;
+    }
+
+    field(int am) {
+        used = new bool[am];
+    }
 };
 #endif //FIELD_H_

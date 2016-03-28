@@ -34,8 +34,8 @@ int amount_of_ships;
 int curr_ship;
 field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
-float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0, 1, 0, 1};
-float bomb_color[] = {1, 0, 0, 1}, aqua_color[] = {0.5, 0.5, 0.5, 1};
+float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
+float bomb_color[] = {1, 0, 0, 1}, aqua_color[] = {0, 0.5, 1, 1};
 bool window_should_close = false, play_audio = true, turning = false;
 int cnt;
 background bg;
@@ -119,7 +119,11 @@ void MouseEvent(int button, int state, int x, int y) {
         if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
             x -= field1.move.m[2];
             y -= field1.move.m[5];
-            turn(x, y, field1, ships);
+            if (!field1.used[get_cell_idx(point(x, y))]) {
+                turn(x, y, field1, ships);
+                field1.used[get_cell_idx(point(x, y))] = true;
+            }
+
         }
     }
     
@@ -262,6 +266,8 @@ static void CreateVertexBuffer()
 }
 
 void init_fields() {
+    field1 = field(amount_of_polygons);
+    field2 = field(amount_of_polygons);
     field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
     field2.move.m[2] = 860;
     field1.bombs.push_back(19);

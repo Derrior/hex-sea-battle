@@ -71,6 +71,7 @@ bool check(field& r, ship* b) {
 }
 
 bool turn(int x, int y, field& r, ship* b) {
+    
     for (int i = 0; i < amount_of_ships; i++) {
         for (int j = 0; j < b[i].strength; j++) {
             if (b[i].is_damaged[j]) {
