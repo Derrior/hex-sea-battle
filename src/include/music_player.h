@@ -5,32 +5,17 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_audio.h>
 #include <cstdlib>
-SDL_Surface* Surface;
+extern SDL_Surface* Surface;
 
-unsigned char* wav_buffer;
-unsigned int wav_length;
-unsigned int audio_len;
-unsigned char* audio_pos;
+extern unsigned char* wav_buffer;
+extern unsigned int wav_length;
+extern unsigned int audio_len;
+extern unsigned char* audio_pos;
 
-int min_32t(int a, int b) {
-    return (a < b ? a : b);
-}
+int min_32t(int a, int b);
 
-int sdl_init() {
-    return SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-}
+int sdl_init();
 
-void my_audio_callback(void *, Uint8 *stream, int len) {
-    
-    if (audio_len == 0) {
-        audio_pos = wav_buffer;
-        audio_len = wav_length;
-    }
-    len = min_32t(len, audio_len); 
-    SDL_memcpy(stream, audio_pos, len);                  // simply copy from one buffer into the other
-    
-    audio_pos += len;
-    audio_len -= len;
-}
 
+void my_audio_callback(void *, Uint8 *stream, int len);
 #endif //PLAYER_H

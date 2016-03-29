@@ -2,18 +2,22 @@
 #define GL_H
 
 #include <GL/glew.h>
+#include <music_player.h>
 #include <GL/freeglut.h>
 #include <background.h>
+#include <init_world.h>
 #include <math_3d.h>
 #include <polygon.h>
 #include <drawing.h>
 #include <shader.h>
 #include <iostream>
+#include <engine.h>
 #include <field.h>
 #include <geom.h>
 #include <cstdio>
 #include <file.h>
 #include <ship.h>
+#include <gl.h>
 
 #define D_X 1
 
@@ -29,8 +33,11 @@ extern int amount_of_polygons, ibo_size, amount_of_ships, curr_ship;
 extern ship* ships;
 extern field field1, field2;
 extern int mouse_x, mouse_y;
+extern float field_color[];
 extern float ship_color[], current_ship_color[];
 extern float bomb_color[], aqua_color[];
 extern int cnt;
 extern background bg;
+extern SDL_AudioSpec wav_spec;
+extern bool window_should_close, play_audio, turning;
 #endif //GL_H

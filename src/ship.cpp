@@ -54,7 +54,7 @@ bool ship::in_ship(point p) {
 }
 
 point ship::get_point(int j) {
-    return point(pos.m[2], pos.m[5]) + (vec(0, sqrt(3) * 29) * j).rotate(matrixes[rot]);
+    return point(pos.m[2], pos.m[5]) + (vec(0, sqrt(3) * CELL_RAD) * j).rotate(matrixes[rot]);
 
 }
 

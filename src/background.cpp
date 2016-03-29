@@ -18,7 +18,7 @@ color::color(float _a, float _b, float _c, float _d) {
 void init_colors() {
     colors = new color[10];
     for (int i = 0; i < 10; i++) 
-        colors[i] = color((float)get_rand(0, 127) / 127, (float)get_rand(0, 255) / 127, (float)get_rand(0, 255) / 127, 1.f);
+        colors[i] = color((float)get_rand(0, 127) / 127, (float)get_rand(0, 255) / 255, (float)get_rand(0, 255) / 255, 1.f);
 }
 
 background::background() {

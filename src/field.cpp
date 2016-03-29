@@ -1,10 +1,10 @@
 #include <geom.h>
+#include <field.h>
 #include <polygon.h>
 
 using namespace std;
-
-#define CONST_X 45
-#define CONST_Y 52
+const float CONST_X = 45 * (CELL_RAD / 29.0);
+const float CONST_Y = 52.1 * (CELL_RAD / 29.0);
 
 polygon* gen_field(int w, int h, int scale)
 {
@@ -21,7 +21,7 @@ polygon* gen_field(int w, int h, int scale)
 polygon* gen_ship(int w) {
     polygon* res = new polygon[w];
     for (int i = 0; i < w; i++) {
-        res[i] = gen_cell(point(0, i * sqrt(3) * 29 + i * 2));
+        res[i] = gen_cell(point(0., i * CONST_Y));
     }
     return res;
     
