@@ -6,14 +6,13 @@
 using namespace std;
 
 int get_cell_idx(point a) {
-    int x = a.x, y = a.y;
 
     for (int i = 0; i < amount_of_polygons; i++) {
-        if (in_polygon(point(x, y), Field[i])) {
+        if (in_polygon(a, Field[i])) {
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 
@@ -39,31 +38,26 @@ bool check(field& r, ship* b) {
             point curr_centre = b[i].get_point(j);
             curr_centre.x -= r.move.m[2];
             curr_centre.y -= r.move.m[5];
-            //std::cout << " (" << curr_centre.x << "; " << curr_centre.y << ")\n";
-            for (int k = 0; k < amount_of_polygons; k++) {
-                if (in_polygon(curr_centre, Field[k])) {
-                    if (used[k] != -1 and used[k] != i) {
-                        r.bombs.push_back(k);
-                    }
-                    //std::cout << i << ' ' << j << ' ' << k << " (" << curr_centre.x << "; " << curr_centre.y << ")\n";
-                    //std::cout << k << std::endl;
-                    used[k] = i;
-                    may_be_near[k] = false;
-                }
+            int k = get_cell_idx(curr_centre);
+            if (k == -1) {
+                continue;
             }
+            if (used[k] != -1 and used[k] != i) {
+                r.bombs.push_back(k);
+            }
+            used[k] = i;
+            may_be_near[k] = false;
             vec neighbour(0, 45);
             for (int m = 0; m < 6; m++) {
                 point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
-                for (int k = 0; k < amount_of_polygons; k++) {
-                    if (in_polygon(curr_neighbour, Field[k])) {
-                        if (!may_be_near[k] and used[k] != i) {
-                            r.bombs.push_back(k);
-                        }
-                        //std::cout << i << ' ' << j << ' ' << k << " (" << curr_neighbour.x << "; " << curr_neighbour.y << ")" << 
-                        //    Field[k].centre.x << ' ' << Field[k].centre.y << "\n";
-                        used[k] = i;
-                    }
+                k = get_cell_idx(curr_neighbour);
+                if (k == -1) {
+                    continue;
                 }
+                if (!may_be_near[k] and used[k] != i) {
+                    r.bombs.push_back(k);
+                }
+                used[k] = i;
             }
         }
     }
@@ -89,7 +83,11 @@ bool turn(int x, int y, field& r, ship* b) {
                     point which_cell = b[i].get_point(j);
                     which_cell.x -= r.move.m[2];
                     which_cell.y -= r.move.m[5];
-                    r.bombs.push_back(get_cell_idx(which_cell));
+                    int cell_idx = get_cell_idx(which_cell);
+                    if (cell_idx == -1) {
+                        continue;
+                    }
+                    r.bombs.push_back(cell_idx);
                     b[i].is_damaged[j] = true;
                     if (!b[i].is_alive()) {
                         bool used[amount_of_polygons];
@@ -103,9 +101,9 @@ bool turn(int x, int y, field& r, ship* b) {
                             //cout << curr_centre << endl;
                             for (int m = 0; m < 6; m++) {
                                 point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
-                                int cell_idx = get_cell_idx(curr_neighbour);
+                                cell_idx = get_cell_idx(curr_neighbour);
                                 //cout << curr_neighbour << cell_idx << endl;
-                                if (!used[cell_idx]) {
+                                if (cell_idx != -1 and !used[cell_idx]) {
                                     r.aqua.push_back(cell_idx);
                                 }
                             }
@@ -120,6 +118,9 @@ bool turn(int x, int y, field& r, ship* b) {
             }
         }
     }
-    r.aqua.push_back(get_cell_idx(point(x, y)));
+    int cell_idx = get_cell_idx(point(x, y));
+    if (cell_idx != -1) {
+        r.aqua.push_back(cell_idx);
+    }
     return true;
 }
