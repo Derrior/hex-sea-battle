@@ -54,6 +54,7 @@ void PressEvent(unsigned char key, int x, int y) {
         check(field1, ships);
     } else if (key == ' ') {
         turning = true;
+        curr_ship = -1;
     }
 }
 
@@ -181,9 +182,9 @@ int main(int argc, char** argv)
     init_audio();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(1366, 768);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Tutorial 01");
+    glutFullScreen();
 
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
