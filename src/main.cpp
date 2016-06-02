@@ -164,11 +164,10 @@ static void RenderSceneCB()
     }
     draw_bombs(field1);
     draw_bombs(field2);
+    draw_buttons();
     if (curr_ship != -1) {
         draw_ship(curr_ship, current_ship_color);
     }
-    draw_buttons();
-    glUniform4fv(f_color_loc, 1, white_color);
     glutSwapBuffers();
 }
  
