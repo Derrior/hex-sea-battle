@@ -4,6 +4,17 @@
 
 using namespace std;
 
+void draw_text(point pos, string& text) {
+    World.m[2] = pos.x;
+    World.m[5] = pos.y;
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+    glRasterPos2f(pos.x, pos.y);
+    int len = text.length();
+    for (int i = 0; i < len; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+    }
+}
+
 void draw_cell(int cell_idx, const float* color, field& F) {
         World.m[2] = F.move.m[2] + Field[cell_idx].centre.x;
         World.m[5] = F.move.m[5] + Field[cell_idx].centre.y;
@@ -89,3 +100,23 @@ void draw_bombs(field& F) {
     }
 }
 
+void draw_buttons() {
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
+    for (int i = 0; i < (int)buttons.size(); i++) {
+        World.m[2] = buttons[i].place.x;
+        World.m[5] =  buttons[i].place.y;
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+        glUniform1f(scale_loc, 1.2);
+        glUniform4fv(f_color_loc, 1, aqua_color);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        draw_text(point((buttons[i].place.x - 4.5 * buttons[i].name.length()), buttons[i].place.y - buttons[i].name.length()), buttons[i].name);
+        glDisableVertexAttribArray(0);
+    }
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+}

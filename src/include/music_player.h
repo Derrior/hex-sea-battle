@@ -1,7 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <SDL2/SDL.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_audio.h>
 #include <cstdlib>

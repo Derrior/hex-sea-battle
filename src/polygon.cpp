@@ -19,8 +19,8 @@ polygon gen_cell(point centre, float rad)
 
 bool in_polygon(point a, polygon& b) {
 
-    for (int l = 0; l < 6; l++) {
-        int r = (l + 1) % 6;
+    for (int l = 0; l < b.points.size(); l++) {
+        int r = (l + 1) % b.points.size();
         point triangle[] = {b.centre, b.points[l], b.points[r]};
         if (in_triangle(a, triangle))
             return true;

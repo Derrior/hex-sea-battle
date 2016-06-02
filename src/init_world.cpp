@@ -72,3 +72,12 @@ void init_audio() {
     }
 
 }
+
+void init_buttons() {
+    string name = "check!";
+    button b1(200, 50, name);
+    b1.register_callback([](){
+        check(field1, ships);
+    });
+    buttons.push_back(b1);
+}

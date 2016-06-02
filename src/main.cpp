@@ -1,5 +1,5 @@
 #include <gl.h>
-
+#include <SDL/SDL.h>
 using namespace std;
 
 int WINDOW_WIDTH, WINDOW_HEIGHT;
@@ -8,20 +8,23 @@ unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc
 polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
-int amount_of_polygons;
+Matrix3f Empty;
+int amount_of_polygons, amount_of_ships, curr_ship;
 int ibo_size;
 ship* ships;
-int amount_of_ships;
-int curr_ship;
 field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
-float field_color[] = {0.9, 0.9, 0.9, 0.7};
+float field_color[] = {0.9, 0.9, 0.9, 0.7}, white_color[] = {1, 1, 1, 1};
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
-bool window_should_close = false, play_audio = true, turning = false;
+bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
 int cnt;
+long double curr_time;
+long long time_last_check;
 background bg;
+vector<button> buttons;
 SDL_AudioSpec wav_spec;
+//const int SCREEN_WIDTH = 640; const int SCREEN_HEIGHT = 480; const int SCREEN_BPP = 32;
 
 
 void PressEvent(unsigned char key, int x, int y) {
@@ -51,7 +54,10 @@ void PressEvent(unsigned char key, int x, int y) {
     } else if (key == 27) {
         glutDestroyWindow(1);
     } else if (key == 13) {
+        time_last_check = time(NULL);
+        bombs_removed = false;
         check(field1, ships);
+
     } else if (key == ' ') {
         turning = true;
         curr_ship = -1;
@@ -60,6 +66,13 @@ void PressEvent(unsigned char key, int x, int y) {
 
 void MouseEvent(int button, int state, int x, int y) {
     y = 768 - y;
+    for (int i = 0; i < buttons.size(); i++) {
+        if (buttons[i].is_pressed(point(x, y))) {
+            buttons[i].call_callback();
+            cout << "try to catch" << endl;
+            return;
+        }
+    }
     x -= Camera.m[2];
     y -= Camera.m[5];
     if (!turning) {
@@ -127,6 +140,7 @@ void SpecialEvent(int key, int, int) {
 
 static void RenderSceneCB()
 { 
+    curr_time = time(NULL);
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
@@ -141,11 +155,20 @@ static void RenderSceneCB()
     for (int i = 0; i < amount_of_ships; i++) {
         draw_ship(i, ship_color);
     }
+    if (!turning) {
+        if (!bombs_removed and (long long)curr_time - time_last_check > BOMB_CONST) {
+            field1.bombs.clear();
+            field2.bombs.clear();
+            bombs_removed = true;
+        }
+    }
     draw_bombs(field1);
     draw_bombs(field2);
     if (curr_ship != -1) {
         draw_ship(curr_ship, current_ship_color);
     }
+    draw_buttons();
+    glUniform4fv(f_color_loc, 1, white_color);
     glutSwapBuffers();
 }
  
@@ -181,11 +204,33 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 }
 #endif
-
+/*
+SDL_Surface *image = NULL;
+SDL_Surface *load_image() {
+    SDL_Surface* loaded, *optimized;
+    loaded = optimized = NULL;
+    loaded = SDL_LoadBMP("image");
+    if (loaded) {
+        optimized = SDL_DisplayFormat(loaded);
+        SDL_FreeSurface(loaded);
+    }
+    return optimized;
+}
+void apply_surface(int x, int y, SDL_Surface* source, SDL_Surface* destination) { 
+    //Make a temporary rectangle to hold the offsets 
+    SDL_Rect offset;
+    //Give the offsets to the rectangle 
+    offset.x = x;  
+    offset.y = y;
+    SDL_BlitSurface(source, NULL, destination, &offset); 
+}
+*/
 int main(int argc, char** argv)
 {
+    curr_time = time(NULL);
     sdl_init();
     init_audio();
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(0, 0);
@@ -202,10 +247,15 @@ int main(int argc, char** argv)
         return 1;
     }
     glClearColor(0.5f, .5f, .5f, .0f);
+    /*
+    SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE ); 
+    apply_surface(10, 10, image, screen);
+    */
     init_matrixes();
     init_ship_object();
     init_fields();
     init_colors();
+    init_buttons();
     create_field_vbo();
     cout << "created" << endl;
     init_resourses();

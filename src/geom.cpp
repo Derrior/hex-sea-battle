@@ -85,14 +85,25 @@ float vec::len()
     return sqrt(x * x + y * y);
 }
 
-vec vec::operator* (float coeff)
+vec vec::operator* (float coeff) const
 {
     vec res(*this);
     res.x *= coeff;
     res.y *= coeff;
     return res;
 }
-vec vec::resize(float len)
+
+vec vec::operator/ (float coeff) const
+{
+    vec res(*this);
+    if (coeff != 0) {
+        res.x /= coeff;
+        res.y /= coeff;
+    }
+    return res;
+}
+
+vec vec::resize(float len) const
 {
     vec res(*this);
     return res * (len / (res.len()));

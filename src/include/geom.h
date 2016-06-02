@@ -40,9 +40,11 @@ struct vec
 
     point get_point();
 
-    vec operator* (float coeff);
+    vec operator* (float coeff) const;
+
+    vec operator/ (float coeff) const;
     
-    vec resize(float len);
+    vec resize(float len) const;
 
     vec rotate(float angle);
 

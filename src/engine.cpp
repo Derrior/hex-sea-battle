@@ -57,7 +57,9 @@ bool check(field& r, ship* b) {
                 if (!may_be_near[k] and used[k] != i) {
                     r.bombs.push_back(k);
                 }
-                used[k] = i;
+                if (used[k] == -1) {
+                    used[k] = i;
+                }
             }
         }
     }
