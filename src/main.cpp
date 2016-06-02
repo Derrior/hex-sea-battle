@@ -175,6 +175,12 @@ void init_resourses() {
     glDisable(GL_CULL_FACE);
 }
 
+#ifdef _WIN32
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	main(0, NULL);
+
+}
+#endif
 
 int main(int argc, char** argv)
 {

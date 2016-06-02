@@ -11,7 +11,10 @@ include_directories("src/include")
 ## Use all the *.cpp files we found under this folder for the project
 
 set (SRC_LIST src/main.cpp
+		
               src/background.cpp
+	      src/init_world.cpp
+	      src/music_player.cpp
               src/drawing.cpp
               src/engine.cpp
               src/field.cpp
@@ -26,4 +29,4 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -pipe -Wall -Wextra -Wshadow")
 ## Define the executable
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
-target_link_libraries(${PROJECT_NAME} m glew32 freeglut opengl32)
+target_link_libraries(${PROJECT_NAME} m glew32 freeglut opengl32 sdl2)

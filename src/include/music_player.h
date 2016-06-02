@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #include <SDL2/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL/SDL.h>
 #include <SDL/SDL_audio.h>
 #include <cstdlib>
 extern SDL_Surface* Surface;
