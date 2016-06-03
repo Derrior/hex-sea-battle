@@ -108,17 +108,6 @@ void draw_buttons() {
         World.m[5] =  buttons[i].place.y;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-	glUniform4fv(f_color_loc, 1, bomb_color);
-        glUniform1f(scale_loc, 1);
-	for (int j = -200; j < 200; j++) {
-		for (int k = -200; k < 200; k++) {
-			if (abs(j) + abs(k) < 200) {
-				glBegin(GL_POINTS);
-				glVertex3f(j, k, 1);
-				glEnd();
-			}
-		}
-	}
         glUniform1f(scale_loc, 1.2);
         glUniform4fv(f_color_loc, 1, aqua_color);
         glEnableVertexAttribArray(0);

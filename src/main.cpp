@@ -111,11 +111,15 @@ void MouseEvent(int button, int state, int x, int y) {
 }
 
 void PassiveMotionEvent(int x, int y) {
+    y = 768 - y;
 
     if (x < 0 or x > WINDOW_WIDTH) return;
     if (y < 0 or y > WINDOW_HEIGHT) return;
     for (int i = 0; i < (int)buttons.size(); i++) {
-	if (distance_m((buttons[i].place), point((float)(x * 1.2), (float)(y * 1.2))) < 200) {
+	if (distance_m((buttons[i].place), point(x, y)) < 100) {
+        y = 768 - y;
+        mouse_x = x;
+        mouse_y = y;
 		return;
 	}
 
@@ -127,13 +131,14 @@ void PassiveMotionEvent(int x, int y) {
         Camera.m[2] -= CONST_SPEED_CAMERA * (x - 3 * WINDOW_WIDTH / 4)  / 1000;
     }
     if (y < WINDOW_HEIGHT / 16) {
-        Camera.m[5] -= CONST_SPEED_CAMERA * (WINDOW_HEIGHT / 4 - y) / 500;
+        Camera.m[5] += CONST_SPEED_CAMERA * (WINDOW_HEIGHT / 4 - y) / 500;
     }
     if (y > WINDOW_HEIGHT * 15 / 16) {
-        Camera.m[5] += CONST_SPEED_CAMERA * (y - 3 * WINDOW_HEIGHT / 4)  / 500;
+        Camera.m[5] -= CONST_SPEED_CAMERA * (y - 3 * WINDOW_HEIGHT / 4)  / 500;
     }
     Camera.m[2] = max(-500.0f, Camera.m[2]);
     Camera.m[5] = max(-500.0f, Camera.m[5]);
+    y = 768 - y;
     mouse_x = x;
     mouse_y = y;
 }
