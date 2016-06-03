@@ -26,6 +26,7 @@ set (SRC_LIST src/main.cpp
               src/SOIL/image_DXT.c
               src/SOIL/image_helper.c
               src/SOIL/SOIL.c
+	      src/SOIL/stb_image_aug.c
 			  )
 set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -pipe -Wall -Wextra -Wshadow")
 

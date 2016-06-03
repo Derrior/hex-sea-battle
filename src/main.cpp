@@ -1,4 +1,5 @@
 #include <gl.h>
+#include <ctime>
 #include <SDL/SDL.h>
 #include <SOIL/SOIL.h>
 using namespace std;
