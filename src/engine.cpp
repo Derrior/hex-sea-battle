@@ -18,9 +18,9 @@ int get_cell_idx(point a) {
 
 void get_triangle(int idx, point* &res) {
     res = new point[3];
-    res[0] = point(ship_vbo_data[ship_ibo_data[idx] * 2], ship_vbo_data[ship_ibo_data[idx] * 2 + 1]);
-    res[1] = point(ship_vbo_data[ship_ibo_data[idx + 1] * 2], ship_vbo_data[ship_ibo_data[idx + 1] * 2 + 1]);
-    res[2] = point(ship_vbo_data[ship_ibo_data[idx + 2] * 2], ship_vbo_data[ship_ibo_data[idx + 2] * 2 + 1]);
+    res[0] = point(ship_vbo_data[ship_ibo_data[idx]][0], ship_vbo_data[ship_ibo_data[idx]][1]);
+    res[1] = point(ship_vbo_data[ship_ibo_data[idx + 1]][0], ship_vbo_data[ship_ibo_data[idx + 1]][1]);
+    res[2] = point(ship_vbo_data[ship_ibo_data[idx + 2]][0], ship_vbo_data[ship_ibo_data[idx + 2]][1]);
     return;
 }
 

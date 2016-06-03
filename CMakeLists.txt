@@ -23,6 +23,9 @@ set (SRC_LIST src/main.cpp
               src/polygon.cpp
               src/shader.cpp
               src/ship.cpp
+              src/SOIL/image_DXT.c
+              src/SOIL/image_helper.c
+              src/SOIL/SOIL.c
 			  )
 set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -pipe -Wall -Wextra -Wshadow")
 

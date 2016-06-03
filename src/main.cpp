@@ -1,20 +1,25 @@
 #include <gl.h>
 #include <SDL/SDL.h>
+#include <SOIL/SOIL.h>
 using namespace std;
+
 
 int WINDOW_WIDTH, WINDOW_HEIGHT;
 unsigned int vbo, ibo_buffer, program, menu;
-unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc;
+unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc;
 polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
 Matrix3f Empty;
 int amount_of_polygons, amount_of_ships, curr_ship;
 int ibo_size;
+int colorscheme;
 ship* ships;
 field field1, field2;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
-float field_color[] = {0.9, 0.9, 0.9, 0.7}, white_color[] = {1, 1, 1, 1};
+float field_color[] = {0.9, 0.9, 0.9, 0.4,
+                       0.1, 0.1, 0.1, 0.4,
+                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1};
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
@@ -24,7 +29,6 @@ long long time_last_check;
 background bg;
 vector<button> buttons;
 SDL_AudioSpec wav_spec;
-//const int SCREEN_WIDTH = 640; const int SCREEN_HEIGHT = 480; const int SCREEN_BPP = 32;
 
 
 void PressEvent(unsigned char key, int x, int y) {
@@ -153,6 +157,7 @@ static void RenderSceneCB()
     draw_field(field2);
     
     for (int i = 0; i < amount_of_ships; i++) {
+        if (i != curr_ship)
         draw_ship(i, ship_color);
     }
     if (!turning) {
@@ -191,6 +196,7 @@ void init_resourses() {
     angle_loc = glGetUniformLocation(program, "rotate");
     camera_loc = glGetUniformLocation(program, "camera");
     f_color_loc = glGetUniformLocation(program, "f_color");
+    tex_loc = glGetUniformLocation(program, "tex");
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -203,27 +209,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 }
 #endif
-/*
-SDL_Surface *image = NULL;
-SDL_Surface *load_image() {
-    SDL_Surface* loaded, *optimized;
-    loaded = optimized = NULL;
-    loaded = SDL_LoadBMP("image");
-    if (loaded) {
-        optimized = SDL_DisplayFormat(loaded);
-        SDL_FreeSurface(loaded);
-    }
-    return optimized;
-}
-void apply_surface(int x, int y, SDL_Surface* source, SDL_Surface* destination) { 
-    //Make a temporary rectangle to hold the offsets 
-    SDL_Rect offset;
-    //Give the offsets to the rectangle 
-    offset.x = x;  
-    offset.y = y;
-    SDL_BlitSurface(source, NULL, destination, &offset); 
-}
-*/
+
+int tex2d;
+
 int main(int argc, char** argv)
 {
     curr_time = time(NULL);
@@ -258,6 +246,8 @@ int main(int argc, char** argv)
     create_field_vbo();
     cout << "created" << endl;
     init_resourses();
+    int im_w, im_h;
+    tex2d = SOIL_load_OGL_texture("img.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
     while (!window_should_close) {
         glutMainLoop();
     }

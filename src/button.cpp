@@ -29,7 +29,7 @@ button::button(int x, int y, string &_name) {
 
 bool button::is_pressed(point click) {
     bool res = in_polygon(vec(place, click).get_point(), p);
-    cout << "nearly success" << ' ' << res << endl; 
+    cout << "nearly success " << name << ' ' << res << endl; 
     return res; 
 }
 

@@ -6,7 +6,7 @@ using namespace std;
 
 unsigned int ship_vbo, ship_ibo;
 unsigned int ship_ibo_size;
-float ship_vbo_data[SHIP_SIZE * 5];
+float ship_vbo_data[7 * 5][4];
 unsigned int* ship_ibo_data;
 float matrixes[6][4];
 
@@ -16,7 +16,7 @@ void init_ship_object() {
     polygon* me = gen_ship(4);
 
     for (int i = 0; i < 4; i++) {
-        draw_polygon(me[i], ship_vbo_data, 14 * i, ibo);
+        draw_polygon(me[i], ship_vbo_data, 7 * i, ibo);
     }
     glGenBuffers(1, &ship_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);

@@ -22,11 +22,11 @@ void set_ship(int& x, int& y, field& F) {
 
 void create_field_vbo() {
 
-    float points[14 * amount_of_polygons];
+    float points[7 * amount_of_polygons][4];
     vector<int> ibo;
     for (int i = 0; i < amount_of_polygons; i++)
     {
-        draw_polygon(Field[i], points, i * 14, ibo);
+        draw_polygon(Field[i], points, i * 7, ibo);
     }
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -74,10 +74,15 @@ void init_audio() {
 }
 
 void init_buttons() {
-    string name = "check!";
+    string name = "Check!", n2 = "Switch";
     button b1(200, 50, name);
+    button b2(70, 700, n2);
     b1.register_callback([](){
         check(field1, ships);
     });
+    b2.register_callback([](){
+        colorscheme = (colorscheme + 1) % AMOUNT_COLORSCHEMES;
+    });
     buttons.push_back(b1);
+    buttons.push_back(b2);
 }

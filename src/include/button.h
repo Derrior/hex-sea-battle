@@ -3,7 +3,7 @@
 #include <functional>
 #include <polygon.h>
 #include <vector>
-#define TIME_BETWEEN_ACTIVATIONS 0.05
+#define TIME_BETWEEN_ACTIVATIONS 0.04
 struct button {
     polygon p;
     std::string name;

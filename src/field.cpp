@@ -27,13 +27,15 @@ polygon* gen_ship(int w) {
     
 }
 
-void to_float(float* arr, int& idx, point c)
+void to_float(float arr[][4], int& idx, point c)
 {
-    arr[idx] = c.x;
-    arr[idx + 1] = c.y;
-    idx += 2;
+    arr[idx][0] = c.x;
+    arr[idx][1] = c.y;
+    arr[idx][2] = 0;
+    arr[idx][3] = 0;
+    idx += 1;
 }
-void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
+void draw_polygon(polygon& p, float vbo_data[][4], int idx, vector<int>& ibo)
 {
     to_float(vbo_data, idx, p.centre);
     int was_idx = idx;
@@ -42,7 +44,7 @@ void draw_polygon(polygon& p, float* vbo_data, int idx, vector<int>& ibo)
     {
         to_float(vbo_data, idx, p.points[i]);
     }
-    idx = was_idx / 2;
+    idx = was_idx;
     for (int i = 0; i < (int)p.points.size(); i++)
     {
         ibo.push_back(idx - 1);

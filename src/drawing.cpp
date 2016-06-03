@@ -25,7 +25,7 @@ void draw_cell(int cell_idx, const float* color, field& F) {
         glUniform4fv(f_color_loc, 1, color);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
@@ -42,7 +42,7 @@ void draw_cell(int cell_idx) {
         glUniform4fv(f_color_loc, 1, &colors[bg.color_idx[cell_idx]].c[0]);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
@@ -72,7 +72,7 @@ void draw_ship(int ship_idx, const float* color) {
         glUniform4fv(f_color_loc, 1, color);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, ships[ship_idx].ibo_size, GL_UNSIGNED_INT, 0);
@@ -83,10 +83,10 @@ void draw_ship(int ship_idx, const float* color) {
 void draw_field(field& F) {
     glUniformMatrix3fv(world_loc, 1, GL_TRUE, &F.move.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    glUniform4fv(f_color_loc, 1, field_color);
+    glUniform4fv(f_color_loc, 1, field_color + (4 * colorscheme));
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_buffer);
     glDrawElements(GL_TRIANGLES, ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
@@ -113,7 +113,7 @@ void draw_buttons() {
         glUniform4fv(f_color_loc, 1, aqua_color);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -121,4 +121,5 @@ void draw_buttons() {
         draw_text(point((buttons[i].place.x - 4.5 * buttons[i].name.length()), buttons[i].place.y - buttons[i].name.length()), buttons[i].name);
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+    glUniform1f(scale_loc, 1);
 }
