@@ -6,7 +6,7 @@ using namespace std;
 
 int WINDOW_WIDTH, WINDOW_HEIGHT;
 unsigned int vbo, ibo_buffer, program, menu;
-unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc;
+unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, aa, any_texture_loc;
 polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
@@ -20,7 +20,7 @@ GLuint tex;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float field_color[] = {0.9, 0.9, 0.9, 0.4,
                        0.1, 0.1, 0.1, 0.4,
-                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 1};
+                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 0};
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
@@ -180,8 +180,8 @@ static void RenderSceneCB()
                       100, 100, 1, 0,
                       0, 100, 0, 0};
     unsigned int newbuf;
-    unsigned int aa = glGetAttribLocation(program, "tex_coord");
     glActiveTexture(GL_TEXTURE1);
+    glUniform1i(any_texture_loc, 1);
     glUniform1i(tex_loc, tex);
     glUniform4fv(f_color_loc, 1, black_color);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -201,7 +201,8 @@ static void RenderSceneCB()
     glDisableVertexAttribArray(aa);
     glUniform1i(tex_loc, 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glUniform1i(any_texture_loc, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 //end of test zone
 
     glutSwapBuffers();
@@ -228,6 +229,8 @@ void init_resourses() {
     camera_loc = glGetUniformLocation(program, "camera");
     f_color_loc = glGetUniformLocation(program, "f_color");
     tex_loc = glGetUniformLocation(program, "tex");
+    any_texture_loc = glGetUniformLocation(program, "using_textures");
+    aa = glGetAttribLocation(program, "tex_coord");
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -280,8 +283,8 @@ int main(int argc, char** argv)
     glBindTexture(GL_TEXTURE_2D, tex);
     int im_w, im_h;
     int width, height;
-    unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGBA);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
     SOIL_free_image_data(image);
 
 
