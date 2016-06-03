@@ -1,6 +1,8 @@
 #include <gl.h>
 #include <SDL/SDL.h>
 #include <SOIL/SOIL.h>
+#include <ctime>
+#include <stdlib.h>
 using namespace std;
 
 
@@ -169,7 +171,7 @@ static void RenderSceneCB()
     }
     draw_bombs(field1);
     draw_bombs(field2);
-    draw_buttons();
+    //draw_buttons();
     if (curr_ship != -1) {
         draw_ship(curr_ship, current_ship_color);
     }
@@ -203,12 +205,6 @@ void init_resourses() {
     glDisable(GL_CULL_FACE);
 }
 
-#ifdef _WIN32
-int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	main(0, NULL);
-
-}
-#endif
 
 int tex2d;
 
@@ -220,9 +216,9 @@ int main(int argc, char** argv)
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowSize(300, 300);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Tutorial 01");
-    glutFullScreen();
 
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
@@ -256,3 +252,9 @@ int main(int argc, char** argv)
     return 0;
 }
 
+#ifdef _WIN32
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	main(__argc, __argv);
+
+}
+#endif

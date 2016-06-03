@@ -26,10 +26,11 @@ set (SRC_LIST src/main.cpp
               src/SOIL/image_DXT.c
               src/SOIL/image_helper.c
               src/SOIL/SOIL.c
+	      src/SOIL/stb_image_aug.c
 			  )
-set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -pipe -Wall -Wextra -Wshadow")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wshadow")
 
 ## Define the executable
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
-target_link_libraries(${PROJECT_NAME} m glew32 freeglut opengl32 sdl2)
+target_link_libraries(${PROJECT_NAME} m glew32 opengl32 freeglut  sdl2)
