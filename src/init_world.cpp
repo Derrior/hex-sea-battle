@@ -76,7 +76,7 @@ void init_audio() {
 void init_buttons() {
     string name = "Check!", n2 = "Switch";
     button b1(200, 50, name);
-    button b2(70, 700, n2);
+    button b2(100, 670, n2);
     b1.register_callback([](){
         check(field1, ships);
     });
