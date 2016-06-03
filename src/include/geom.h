@@ -58,4 +58,9 @@ point operator- (const point&a, const vec& move);
 point rotate(const point& centre, const point& p, float angle);
 
 bool in_triangle(point a, point* triangle);
+
+float distance(const point& a, const point& b);
+
+
+float distance_m(const point& a, const point& b);
 #endif //GEOM

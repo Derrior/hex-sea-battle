@@ -141,3 +141,12 @@ bool in_triangle(point a, point* triangle) {
         bc.cross(vec(triangle[1], a)) * vec(triangle[1], a).cross(vec(triangle[1], triangle[0])) > 0)) or a == triangle[0] or a == triangle[1] or a == triangle[2];
     return true; 
 }
+
+float distance(const point& a, const point& b) {
+	return vec(a, b).len();
+}
+
+float distance_m(const point& a, const point& b) {
+	vec c(a, b);
+	return fabs(c.x) + fabs(c.y);
+}

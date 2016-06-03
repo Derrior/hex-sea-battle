@@ -111,8 +111,15 @@ void MouseEvent(int button, int state, int x, int y) {
 }
 
 void PassiveMotionEvent(int x, int y) {
+
     if (x < 0 or x > WINDOW_WIDTH) return;
     if (y < 0 or y > WINDOW_HEIGHT) return;
+    for (int i = 0; i < (int)buttons.size(); i++) {
+	if (distance_m((buttons[i].place), point((float)(x * 1.2), (float)(y * 1.2))) < 200) {
+		return;
+	}
+
+    }
     if (x < WINDOW_WIDTH / 16) {
         Camera.m[2] += CONST_SPEED_CAMERA * (WINDOW_WIDTH / 4 - x) / 1000;
     }
