@@ -181,7 +181,6 @@ static void RenderSceneCB()
                       0, 100, 0, 0};
     unsigned int newbuf;
     unsigned int aa = glGetAttribLocation(program, "tex_coord");
-    glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE1);
     glUniform1i(tex_loc, tex);
     glUniform4fv(f_color_loc, 1, black_color);
@@ -201,6 +200,8 @@ static void RenderSceneCB()
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(aa);
     glUniform1i(tex_loc, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 //end of test zone
 
     glutSwapBuffers();
