@@ -43,7 +43,6 @@ extern float ship_color[], current_ship_color[];
 extern float bomb_color[], aqua_color[];
 extern int cnt;
 extern int colorscheme;
-extern int tex2d;
 extern background bg;
 extern SDL_AudioSpec wav_spec;
 extern bool window_should_close, play_audio, turning;

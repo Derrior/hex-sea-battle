@@ -29,7 +29,6 @@ void draw_cell(int cell_idx, const float* color, field& F) {
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
         glDisableVertexAttribArray(0);
 }
 

@@ -16,10 +16,11 @@ int ibo_size;
 int colorscheme;
 ship* ships;
 field field1, field2;
+GLuint tex;
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float field_color[] = {0.9, 0.9, 0.9, 0.4,
                        0.1, 0.1, 0.1, 0.4,
-                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1};
+                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 1};
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
@@ -173,6 +174,35 @@ static void RenderSceneCB()
     if (curr_ship != -1) {
         draw_ship(curr_ship, current_ship_color);
     }
+//  Test zone
+    float points[] = {0, 0, 0, 1,
+                      100, 0, 1, 1,
+                      100, 100, 1, 0,
+                      0, 100, 0, 0};
+    unsigned int newbuf;
+    unsigned int aa = glGetAttribLocation(program, "tex_coord");
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE1);
+    glUniform1i(tex_loc, tex);
+    glUniform4fv(f_color_loc, 1, black_color);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenBuffers(1, &newbuf);
+    glBindBuffer(GL_ARRAY_BUFFER, newbuf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(aa);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(aa, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (2 * sizeof(float)));
+    glDrawArrays(GL_QUADS, 0, 4);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(aa);
+    glUniform1i(tex_loc, 0);
+//end of test zone
+
     glutSwapBuffers();
 }
  
@@ -210,7 +240,6 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 }
 #endif
 
-int tex2d;
 
 int main(int argc, char** argv)
 {
@@ -246,8 +275,15 @@ int main(int argc, char** argv)
     create_field_vbo();
     cout << "created" << endl;
     init_resourses();
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
     int im_w, im_h;
-    tex2d = SOIL_load_OGL_texture("img.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+    int width, height;
+    unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    SOIL_free_image_data(image);
+
+
     while (!window_should_close) {
         glutMainLoop();
     }
