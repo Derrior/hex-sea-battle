@@ -1,20 +1,41 @@
 #include <drawing.h>
 #include <field.h>
+#include <ft.h>
 #include <gl.h>
 
 using namespace std;
 
 void draw_text(point pos, string& text) {
-    World.m[2] = pos.x;
-    World.m[5] = pos.y;
-    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
-    glUniform4fv(f_color_loc, 1, white_color);
-    glRasterPos2f(pos.x, pos.y);
+    float size = 0.7;
+    glActiveTexture(GL_TEXTURE1);
+    glUniform1i(any_texture_loc, 1);
+    glUniform1f(scale_loc, size);
+    glUniform1i(tex_loc, 1);
+//    glUniform4fv(f_color_loc, 1, black_color);
     int len = text.length();
     for (int i = 0; i < len; i++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+        World.m[2] = pos.x;
+        World.m[5] = pos.y;
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, tex_a[(int)text[i]]);
+        glBindBuffer(GL_ARRAY_BUFFER, ft_vbo);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(aa);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glVertexAttribPointer(aa, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (2 * sizeof(float)));
+        glDrawArrays(GL_QUADS, 0, 4);
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(aa);
+       // glActiveTexture(GL_TEXTURE0);
+        pos.x += test[text[i]].advance * size;
     }
-    glRasterPos2f(0, 0);
+    glUniform1i(tex_loc, 0);
+    glUniform1i(any_texture_loc, 0);
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void draw_cell(int cell_idx, const float* color, field& F) {
@@ -108,7 +129,7 @@ void draw_buttons() {
         World.m[5] =  buttons[i].place.y;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform1f(scale_loc, 1.2);
+        glUniform1f(scale_loc, 1.4);
         glUniform4fv(f_color_loc, 1, aqua_color);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
@@ -117,7 +138,7 @@ void draw_buttons() {
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glDisableVertexAttribArray(0);
-        draw_text(point((buttons[i].place.x - 4.5 * buttons[i].name.length()), buttons[i].place.y - buttons[i].name.length()), buttons[i].name);
+        draw_text(point((buttons[i].place.x - 5.5 * buttons[i].name.length()), buttons[i].place.y - buttons[i].name.length()), buttons[i].name);
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniform1f(scale_loc, 1);

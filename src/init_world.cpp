@@ -1,5 +1,5 @@
 #include <init_world.h>
-
+#include <gl.h>
 using namespace std;
 
 void init_matrixes() {
@@ -74,10 +74,12 @@ void init_audio() {
 }
 
 void init_buttons() {
-    string name = "Check!", n2 = "Switch";
+    string name = "check!", n2 = "switch";
     button b1(200, 50, name);
     button b2(100, 670, n2);
-    b1.register_callback([](){
+    b1.register_callback([&time_last_check, &bombs_removed](){
+        time_last_check = time(NULL);
+        bombs_removed = false;
         check(field1, ships);
     });
     b2.register_callback([](){

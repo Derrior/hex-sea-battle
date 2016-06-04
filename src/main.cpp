@@ -1,4 +1,5 @@
 #include <gl.h>
+#include <ft.h>
 #include <ctime>
 #include <SDL/SDL.h>
 #include <SOIL/SOIL.h>
@@ -17,11 +18,12 @@ int ibo_size;
 int colorscheme;
 ship* ships;
 field field1, field2;
-GLuint tex;
+GLuint tex, tex_a[128];
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float field_color[] = {0.9, 0.9, 0.9, 0.4,
                        0.1, 0.1, 0.1, 0.4,
-                       0.3, 0.1, 0.5, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 0};
+                       0.3, 0.1, 0.5, 0.4,
+                       0.6, 0.4, 0.1, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 0};
 float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
@@ -72,7 +74,7 @@ void PressEvent(unsigned char key, int x, int y) {
 
 void MouseEvent(int button, int state, int x, int y) {
     y = 768 - y;
-    for (int i = 0; i < buttons.size(); i++) {
+    for (int i = 0; i < (int)buttons.size(); i++) {
         if (buttons[i].is_pressed(point(x, y))) {
             buttons[i].call_callback();
             cout << "try to catch" << endl;
@@ -188,20 +190,21 @@ static void RenderSceneCB()
         draw_ship(curr_ship, current_ship_color);
     }
 //  Test zone
+    float size_of_image = 30;
     float points[] = {0, 0, 0, 1,
-                      100, 0, 1, 1,
-                      100, 100, 1, 0,
-                      0, 100, 0, 0};
+                      size_of_image, 0, 1, 1,
+                      size_of_image, size_of_image, 1, 0,
+                      0, size_of_image, 0, 0};
     unsigned int newbuf;
     glActiveTexture(GL_TEXTURE1);
     glUniform1i(any_texture_loc, 1);
-    glUniform1i(tex_loc, tex);
+    glUniform1i(tex_loc, 1);
     glUniform4fv(f_color_loc, 1, black_color);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, tex_a[70]);
     glGenBuffers(1, &newbuf);
     glBindBuffer(GL_ARRAY_BUFFER, newbuf);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
@@ -213,7 +216,7 @@ static void RenderSceneCB()
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(aa);
     glUniform1i(tex_loc, 0);
-    glActiveTexture(GL_TEXTURE0);
+   // glActiveTexture(GL_TEXTURE0);
     glUniform1i(any_texture_loc, 0);
     //glBindTexture(GL_TEXTURE_2D, 0);
 //end of test zone
@@ -289,12 +292,14 @@ int main(int argc, char** argv)
     init_fields();
     init_colors();
     init_buttons();
+    cout << "beforeft" << endl;
+    init_ft();
     create_field_vbo();
     cout << "created" << endl;
     init_resourses();
+    //glEnable(GL_TEXTURE_2D);
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    int im_w, im_h;
     int width, height;
     unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGBA);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
