@@ -1,4 +1,5 @@
 #include <init_world.h>
+#include <ctime>
 #include <gl.h>
 using namespace std;
 
