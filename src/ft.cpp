@@ -14,13 +14,14 @@ void init_ft() {
     if (error) {
         cout << "Error while loading freetype" << endl;
     }
-    error = FT_New_Face(library, "fonts/inconsolata.ttf", 0, &face);
+    error = FT_New_Face(library, "fonts/liberation/LiberationMono-Regular.ttf", 0, &face);
+    //error = FT_New_Face(library, "fonts/inconsolata.ttf", 0, &face);
     if (error) {
         cout << "Errors with fonts, exit" << endl;
         return;
     }
 //    error = FT_Set_Pixel_Sizes(face, 0, 14);
-    error = FT_Set_Char_Size(face, 0, 16 * 64, 150, 150);
+    error = FT_Set_Char_Size(face, 0, 11 * 64, 200, 200);
     if (error) {
         cout << "Errors with set size" << endl;
         return;
@@ -46,11 +47,13 @@ void init_ft() {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, slot->bitmap.width, slot->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, slot->bitmap.buffer);
         test[i].size_x = slot->bitmap.width;
         test[i].size_y = slot->bitmap.rows;
+        cout << test[i].size_y << ' ';
         test[i].bearing_x = slot->bitmap_left;
         test[i].bearing_y = slot->bitmap_top;
         test[i].advance = slot->advance.x >> 6;
         test[i].texcoord_x = 0;
     }
+    cout << endl;
     float size_of_char = 16;
     float points[] = {0, 0, 0, 1,
                       size_of_char, 0, 1, 1,

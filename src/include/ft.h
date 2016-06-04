@@ -7,7 +7,7 @@
 
 struct ft_char {
     int size_x;
-    int size_y;
+    float size_y;
     int bearing_x;
     int bearing_y;
     int advance;
