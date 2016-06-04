@@ -190,35 +190,6 @@ static void RenderSceneCB()
         draw_ship(curr_ship, current_ship_color);
     }
 //  Test zone
-    float size_of_image = 30;
-    float points[] = {0, 0, 0, 1,
-                      size_of_image, 0, 1, 1,
-                      size_of_image, size_of_image, 1, 0,
-                      0, size_of_image, 0, 0};
-    unsigned int newbuf;
-    glActiveTexture(GL_TEXTURE1);
-    glUniform1i(any_texture_loc, 1);
-    glUniform1i(tex_loc, 1);
-    glUniform4fv(f_color_loc, 1, black_color);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, tex_a[70]);
-    glGenBuffers(1, &newbuf);
-    glBindBuffer(GL_ARRAY_BUFFER, newbuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(aa);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(aa, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) (2 * sizeof(float)));
-    glDrawArrays(GL_QUADS, 0, 4);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(aa);
-    glUniform1i(tex_loc, 0);
-   // glActiveTexture(GL_TEXTURE0);
-    glUniform1i(any_texture_loc, 0);
-    //glBindTexture(GL_TEXTURE_2D, 0);
 //end of test zone
 
     glutSwapBuffers();
