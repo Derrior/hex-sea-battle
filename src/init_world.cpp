@@ -8,6 +8,7 @@ void init_matrixes() {
         matrixes[i][1] = -sinf(i * (M_PI / 3));
         matrixes[i][2] = -matrixes[i][1];
     }
+    world_scale = 1;
 }
 
 void set_ship(int& x, int& y, field& F) {
@@ -53,7 +54,7 @@ void init_fields() {
     field1 = field(amount_of_polygons);
     field2 = field(amount_of_polygons);
     field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
-    field2.move.m[2] = 860;
+    field2.move.m[2] = 700;
     field1.bombs.push_back(19);
 }
 

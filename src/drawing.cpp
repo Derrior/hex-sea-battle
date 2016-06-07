@@ -115,7 +115,7 @@ void draw_background() {
     Camera.m[2] *= 2;
     Camera.m[5] *= 2;
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    glUniform1f(scale_loc, 1);
+    glUniform1f(scale_loc, world_scale);
 }
 
 void draw_ship(int ship_idx, const float* color) {
@@ -173,5 +173,5 @@ void draw_buttons() {
         draw_text(point((buttons[i].place.x - 6.5 * buttons[i].name.length()), buttons[i].place.y - 1 * buttons[i].name.length()), buttons[i].name);
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    glUniform1f(scale_loc, 1);
+    glUniform1f(scale_loc, world_scale);
 }

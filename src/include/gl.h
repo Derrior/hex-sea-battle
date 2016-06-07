@@ -51,4 +51,6 @@ extern std::vector<button> buttons;
 extern long long time_last_check;
 extern bool bombs_removed;
 extern unsigned int aa;
+extern float world_scale;
 #endif //GL_H
+

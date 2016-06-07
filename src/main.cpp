@@ -13,6 +13,7 @@ polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
 Matrix3f Empty;
+float world_scale;
 int amount_of_polygons, amount_of_ships, curr_ship;
 int ibo_size;
 int colorscheme;
@@ -22,9 +23,18 @@ GLuint tex, tex_a[128];
 int mouse_x = WINDOW_WIDTH / 2, mouse_y = WINDOW_HEIGHT / 2;
 float field_color[] = {0.9, 0.9, 0.9, 0.4,
                        0.1, 0.1, 0.1, 0.4,
-                       0.3, 0.1, 0.5, 0.4,
-                       0.6, 0.4, 0.1, 0.4}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 0};
-float ship_color[] = {1, 0.5, 1, 1}, current_ship_color[] = {0.7, 0, 0.4, 1};
+                       0.3, 0.1, 0.5, 0.7,
+                       0.9, 0.5, 0.1, 0.7}, white_color[] = {1, 1, 1, 1}, black_color[] = {0, 0, 0, 0};
+float ship_color[] = {1, 0.5, 1, 1,
+                      0.8, 0.6, 0, 1,
+                      0.2, 0.6, 0, 1,
+                      0.2, 0.2, 0.2, 1},
+current_ship_color[] = {0.7, 0, 0.4, 1,
+                        0.8, 0.4, 0, 1,
+                        0.9, 0.8, 0.1, 1,
+                        0.2, 0.2, 0.6, 1
+                      };
+
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
 int cnt;
@@ -69,6 +79,10 @@ void PressEvent(unsigned char key, int x, int y) {
     } else if (key == ' ') {
         turning = true;
         curr_ship = -1;
+    } else if (key == '-') {
+        world_scale *= 0.95;
+    } else if (key == '+') {
+        world_scale /= 0.95;
     }
 }
 
@@ -84,7 +98,7 @@ void MouseEvent(int button, int state, int x, int y) {
     x -= Camera.m[2];
     y -= Camera.m[5];
     if (!turning) {
-        if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
+        if (button == GLUT_RIGHT_BUTTON and state == GLUT_DOWN) {
             if (curr_ship == -1) {
                 for (int i = 0; i < amount_of_ships; i++) {
                     if (ships[i].in_ship(point(x, y))) {
@@ -98,6 +112,22 @@ void MouseEvent(int button, int state, int x, int y) {
                 curr_ship = -1;
             }
         }
+        if (button == GLUT_LEFT_BUTTON and state == GLUT_DOWN) {
+            if (curr_ship == -1) {
+                for (int i = 0; i < amount_of_ships; i++) {
+                    if (ships[i].in_ship(point(x, y))) {
+                        curr_ship = i;
+                    }
+                }
+            } 
+        } else if (button == GLUT_LEFT_BUTTON and state == GLUT_UP and curr_ship != -1) {
+            x = ships[curr_ship].pos.m[2];
+            y = ships[curr_ship].pos.m[5];
+            set_ship(x, y, field1);
+            ships[curr_ship].pos.m[2] = x;
+            ships[curr_ship].pos.m[5] = y;
+            curr_ship = -1;
+        }
     } else {
         if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
             x -= field1.move.m[2];
@@ -110,6 +140,18 @@ void MouseEvent(int button, int state, int x, int y) {
         }
     }
     
+}
+
+void MotionEvent(int x, int y) {
+    if (curr_ship != -1) {
+        ships[curr_ship].pos.m[2] += x - mouse_x;
+        ships[curr_ship].pos.m[5] += mouse_y - y;
+    } else {
+        Camera.m[2] += 2 * (x - mouse_x);
+        Camera.m[5] += 2 * (mouse_y - y);
+    }
+    mouse_x = x;
+    mouse_y = y;
 }
 
 void PassiveMotionEvent(int x, int y) {
@@ -174,7 +216,7 @@ static void RenderSceneCB()
     
     for (int i = 0; i < amount_of_ships; i++) {
         if (i != curr_ship)
-        draw_ship(i, ship_color);
+        draw_ship(i, ship_color + 4 * colorscheme);
     }
     if (!turning) {
         if (!bombs_removed and (long long)curr_time - time_last_check > BOMB_CONST) {
@@ -187,7 +229,7 @@ static void RenderSceneCB()
     draw_bombs(field2);
     draw_buttons();
     if (curr_ship != -1) {
-        draw_ship(curr_ship, current_ship_color);
+        draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
     }
 //  Test zone
 //end of test zone
@@ -201,6 +243,7 @@ static void InitializeGlutCallbacks() {
     glutKeyboardFunc(PressEvent);
     glutSpecialFunc(SpecialEvent);
     glutMouseFunc(MouseEvent);
+    glutMotionFunc(MotionEvent);
     glutPassiveMotionFunc(PassiveMotionEvent);
 }
 
