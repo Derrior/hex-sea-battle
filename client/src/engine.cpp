@@ -4,6 +4,7 @@
 #include <iostream>
 
 int mode;
+bool check_pressed;
 
 using namespace std;
 
@@ -26,6 +27,10 @@ void get_triangle(int idx, point* &res) {
     return;
 }
 
+bool check(field& r, ship* b) {
+    check_pressed = true;    
+}
+/*
 bool check(field& r, ship* b) {
     r.bombs.clear();
     int used[amount_of_polygons];
@@ -67,14 +72,14 @@ bool check(field& r, ship* b) {
     }
     return (r.bombs.empty());
 }
-
+*/
 bool turn(int x, int y, field& r, ship* b) {
     
     for (int i = 0; i < amount_of_ships; i++) {
         for (int j = 0; j < b[i].strength; j++) {
-            if (b[i].is_damaged[j]) {
-                continue;
-            }
+            //if (b[i].is_damaged[j]) {
+            //    continue;
+            //}
             point point_to_check(x - b[i].pos.m[2] + r.move.m[2], y - b[i].pos.m[5] + r.move.m[5]);
             //cout << point_to_check.x << ' ' << point_to_check.y << ' ' << b[i].rot <<  endl;
             point_to_check = rotate(point(0, 0), point_to_check, atan2(matrixes[b[i].rot][1], matrixes[b[i].rot][0]));
@@ -92,7 +97,7 @@ bool turn(int x, int y, field& r, ship* b) {
                         continue;
                     }
                     r.bombs.push_back(cell_idx);
-                    b[i].is_damaged[j] = true;
+                    //b[i].is_damaged[j] = true;
                     if (!b[i].is_alive()) {
                         bool used[amount_of_polygons];
                         memset(used, 0, amount_of_polygons);

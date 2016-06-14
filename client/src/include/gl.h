@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <file.h>
 #include <ship.h>
+#include <ft.h>
 
 #define D_X 1
 #define BOMB_CONST 2

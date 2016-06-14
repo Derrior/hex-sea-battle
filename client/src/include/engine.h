@@ -10,6 +10,7 @@
 #define OTHER_MODE 3
 
 extern int mode;
+extern bool check_pressed;
 
 int get_cell_idx(point a);
 

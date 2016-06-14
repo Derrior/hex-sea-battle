@@ -1,6 +1,7 @@
 uniform vec4 f_color;
 uniform sampler2D tex;
 uniform int using_textures;
+//uniform float shadowing;
 varying vec3 new_c;
 varying vec2 new_tex_coord;
 
