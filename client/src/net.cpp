@@ -52,9 +52,9 @@
 
 using namespace std;
 
-char message[1024 * 1024];
+char message[BUFF_LEN];
 SOCKET local_udp_socket;
-int client_num;
+int my_number;
 sockaddr_in server;
 unsigned int server_addrlen;
 
@@ -78,12 +78,21 @@ int init_net(const char *hostname, unsigned short port) {
         return 1;
 
     }*/
-    message[0] = 'H';
+    message[0] = 0;
     message[1] = 'e';
     message[2] = 'l';
     message[3] = 'l';
     sendto(local_udp_socket, message, 4, 0, (struct sockaddr *)&server, server_addrlen); 
-
+    int msg_len = 0;
+    if ((msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_WAITALL, (sockaddr *) &server, &server_addrlen)) > 0) {
+        if (message[0] == OK) {
+            my_number = message[1];
+        } else {
+            printf("Failed to connect: bad answer: %d %d \n", (int)message[0], (int)message[1]);
+        }
+    } else {
+        printf("Failed to connect: no answer\n");
+    }
     return 0;
 
 }
@@ -91,8 +100,10 @@ int init_net(const char *hostname, unsigned short port) {
 int update_net() {
     if (check_pressed) {
         printf("here\n");
-        char* ptr = message;
-        ptr = field1.print_field(message);        
+        char* ptr = message + 2;
+        message[0] = CHECK;
+        message[1] = my_number;
+        ptr = field1.print_field(ptr);        
         for (int i = 0; i < amount_of_ships; i++) {
             char* prev_ptr = ptr;
             ptr = ships[i].print_ship(ptr);

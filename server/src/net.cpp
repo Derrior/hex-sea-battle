@@ -92,11 +92,18 @@ int update_net() {
     }
     */
     while ((msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_DONTWAIT, (sockaddr *) &src_addr, &addrlen)) > 0) {
-        cout << ' ' << message<< endl;
-        for (int i = 0; i < msg_len; i++) {
-            cout << (int)message[i] << ' ';
+        if (message[0] == HELLO) {
+            message[0] = OK;
+            message[1] = client_count;
+            client_count++;
+            sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
+        } else if (message[0] == CHECK) {
+            cout << ' ' << message<< endl;
+            for (int i = 0; i < msg_len; i++) {
+                cout << (int)message[i] << ' ';
+            }
+            cout << endl;
         }
-        cout << endl;
     }
     return 0;
     
