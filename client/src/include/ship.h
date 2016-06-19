@@ -23,5 +23,6 @@ struct ship {
     bool in_ship(point a);
     bool is_alive(); 
     char* print_ship(char* msg);
+    char* write_ship(char* msg);
 };
 #endif //SHIP_H

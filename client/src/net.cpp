@@ -101,9 +101,13 @@ int update_net() {
     if (check_pressed) {
         printf("here\n");
         char* ptr = message + 2;
-        message[0] = CHECK;
+        message[0] = MSG_CHECK;
         message[1] = my_number;
         ptr = field1.print_field(ptr);        
+        for (char* c = message + 2; c != ptr; c++) {
+            printf("%d ", (int)*c);
+        }
+        printf("\n");
         for (int i = 0; i < amount_of_ships; i++) {
             char* prev_ptr = ptr;
             ptr = ships[i].print_ship(ptr);
@@ -114,10 +118,15 @@ int update_net() {
             check_pressed = false;
         }
         sendto(local_udp_socket, message, ptr - message, 0, (sockaddr *)&server, server_addrlen); 
-
+        int msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_WAITALL, (sockaddr *) &server, &server_addrlen);
+        if (message[0] != OK or message[1] != my_number) {
+            return 1;
+        }
+        field1.bombs.resize(message[2]);
+        for (int i = 0; i < message[2]; i++) {
+            field1.bombs[i] = message[3 + i];
+        }
     }
-    
-
 }
 int free_net() {
 //    closesocket(local_tcp_socket);

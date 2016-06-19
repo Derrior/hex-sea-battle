@@ -13,9 +13,8 @@ void init_ship_object();
 void create_ships();
 struct ship {
     Matrix3f pos;
-    int rot;
     int ibo_size;
-    int strength;
+    char strength, rot;
     bool* is_damaged;
     ship(int i = 1) {
         rot = 0;
@@ -53,5 +52,8 @@ struct ship {
         }
         return false;
     }
+    char* print_ship(char* msg);
+    char* write_ship(char* msg);
+
 };
 #endif //SHIP_H

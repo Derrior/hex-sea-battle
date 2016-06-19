@@ -26,7 +26,7 @@ void get_triangle(int idx, point* &res) {
     return;
 }
 
-bool check(field& r, ship* b) {
+int check(field& r, ship* b) {
     r.bombs.clear();
     int used[amount_of_polygons];
     bool may_be_near[amount_of_polygons];
@@ -65,7 +65,7 @@ bool check(field& r, ship* b) {
             }
         }
     }
-    return (r.bombs.empty());
+    return (r.bombs.size());
 }
 
 bool turn(int x, int y, field& r, ship* b) {

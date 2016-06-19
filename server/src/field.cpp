@@ -6,6 +6,15 @@ using namespace std;
 const float CONST_X = 45 * (CELL_RAD / 29.0);
 const float CONST_Y = 52.1 * (CELL_RAD / 29.0);
 
+char* field::print_field(char* msg) {
+    return (char *)memcpy(msg, &move.m[0], sizeof(move)) + sizeof(move);
+}
+
+char* field::write_field(char* msg) {
+    memcpy(&move.m[0], msg, sizeof(move));
+    return msg + sizeof(move);
+}
+
 polygon* gen_field(int w, int h, int scale)
 {
     polygon* res = new polygon[w * h];

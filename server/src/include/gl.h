@@ -8,7 +8,6 @@
 #include <init_world.h>
 #include <math_3d.h>
 #include <polygon.h>
-#include <drawing.h>
 #include <shader.h>
 #include <button.h>
 #include <iostream>
@@ -27,7 +26,6 @@ extern int WINDOW_WIDTH;
 extern int WINDOW_HEIGHT;
 #define CONST_SPEED_CAMERA 20
 extern unsigned int vbo, ibo_buffer, program, menu;
-extern unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, any_texture_loc;
 extern long double curr_time;
 extern polygon* Field;
 extern Matrix3f World;

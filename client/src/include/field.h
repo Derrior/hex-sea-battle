@@ -22,5 +22,6 @@ struct field {
         memset(used, 0, am);
     }
     char* print_field(char* msg); 
+    char* write_field(char* msg); 
 };
 #endif //FIELD_H_

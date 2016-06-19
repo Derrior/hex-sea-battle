@@ -10,6 +10,20 @@ float ship_vbo_data[7 * 5][4];
 unsigned int* ship_ibo_data;
 float matrixes[6][4];
 
+char * ship::print_ship(char * msg) {
+     void *new_p = memcpy(msg, (void *)&pos.m[0], sizeof(pos) + sizeof(int) + 2 * sizeof(char));
+     return (char *)new_p + sizeof(pos) + sizeof(int) + 2 * sizeof(char);
+;
+}
+
+char * ship::write_ship(char * msg) {
+    void *new_p = memcpy((void *)&pos.m[0], msg, sizeof(pos) + sizeof(int) + 2 * sizeof(char));
+    return msg + sizeof(pos) + sizeof(int) + 2 * sizeof(char);
+;
+}
+
+
+
 void init_ship_object() {
     
     vector<int> ibo;

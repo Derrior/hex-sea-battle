@@ -1,19 +1,24 @@
-
-
 #ifdef _WIN32
 	#pragma comment ( lib, "ws2_32.lib" )
 	#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #endif
+
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+
 #ifdef _WIN32
 	#include <winsock2.h>
 	#include <windows.h>
 	#include <time.h>
+
+    #define SYSTEM_PAUSE system("pause")
+
 	typedef unsigned int in_addr_t;
 	typedef int socklen_t;
-    #define SYSTEM_PAUSE system("pause")
 #else
 	#include <sys/types.h>
 	#include <sys/socket.h>
@@ -30,8 +35,10 @@
 	#define WSACleanup() ;
 	#define HOSTENT hostent
 	#define SYSTEM_PAUSE system("wait")
+
 	typedef	int SOCKET;
 #endif
+
 
 #include <net/socket.h>
 #include <net/net.h>
@@ -42,6 +49,7 @@
 #include <iostream>
 #include <vector>
 
+
 #define MAX_CLIENTS 256
 #define PORT 22123
 #define GET_TCP(TYPE, VAL) do { \
@@ -51,9 +59,43 @@
     } \
 } while (0)
 
-#define BUFF_LEN 1024 * 1024
 
 using namespace std;
+
+
+client_t::client_t() {
+    ships = new ship[amount_of_ships];
+    alive = 1;
+}
+
+
+client_t::client_t(int n) {
+    ships = new ship[amount_of_ships];
+    alive = 1;
+    num = n;
+}
+
+void client_t::fill_in(char *src) {
+    char * prev_src = src;
+    src = F.write_field(src);
+    /* debug output
+    for (char * c = prev_src; c != src; c++) {
+        cout << (int)*c << ' ';
+    }
+    cout << endl;
+    */
+    for (int i = 0; i < amount_of_ships; i++) {
+        prev_src = src;
+        src = ships[i].write_ship(src);    
+        /* debug output
+        for (char * c = prev_src; c != src; c++) {
+            cout << (int)*c << ' ';
+        }
+        cout << endl;
+        */
+    }
+}
+
 
 char message[BUFF_LEN];
 
@@ -85,24 +127,39 @@ int update_net() {
         cout <<"somebody tries to connect!" << cnt << endl;
 
     }
-    for (int i = 0; i < (int)clients.size(); i++) {
+    or (int i = 0; i < (int)clients.size(); i++) {
         if ((msg_len = recvfrom(clients[i].tcp, message, BUFF_LEN, MSG_DONTWAIT, (sockaddr *) &src_addr, &addrlen)) > 0) {
             cout << ' ' << message<< endl;
         }
     }
     */
     while ((msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_DONTWAIT, (sockaddr *) &src_addr, &addrlen)) > 0) {
-        if (message[0] == HELLO) {
+        if (message[0] == MSG_HELLO) {
             message[0] = OK;
             message[1] = client_count;
+            clients.push_back(client_t(client_count));
             client_count++;
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
-        } else if (message[0] == CHECK) {
+        } else if (message[0] == MSG_CHECK) {
+            if (clients.size() <= message[1] or message[1] < 0) {
+                continue;
+            }
+            clients[message[1]].fill_in(message + 2);
+
+            message[2] = check(clients[message[1]].F, clients[message[1]].ships);
+            for (int i = 0; i < message[2]; i++) {
+                message[i + 3] = clients[message[1]].F.bombs[i];
+            }
+            message[3 + message[2]] = 0;
+            sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
+            // output of all message only for debug
+            /*
             cout << ' ' << message<< endl;
             for (int i = 0; i < msg_len; i++) {
                 cout << (int)message[i] << ' ';
             }
             cout << endl;
+            */
         }
     }
     return 0;

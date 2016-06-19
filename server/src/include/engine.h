@@ -15,7 +15,7 @@ int get_cell_idx(point a);
 
 void get_triangle(int idx, point* &res);
 
-bool check(field& r, ship* b);
+int check(field& r, ship* b);
 
 bool turn(int x, int y, field& r, ship* b);
 
