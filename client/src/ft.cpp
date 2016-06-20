@@ -21,7 +21,7 @@ void init_ft() {
         return;
     }
 //    error = FT_Set_Pixel_Sizes(face, 0, 14);
-    error = FT_Set_Char_Size(face, 0, 11 * 64, 200, 200);
+    error = FT_Set_Char_Size(face, 0, 20 * 64, 200, 200);
     if (error) {
         cout << "Errors with set size" << endl;
         return;
@@ -54,7 +54,7 @@ void init_ft() {
         test[i].texcoord_x = 0;
     }
     cout << endl;
-    float size_of_char = 16;
+    float size_of_char = 20;
     float points[] = {0, 0, 0, 1,
                       size_of_char, 0, 1, 1,
                       size_of_char, size_of_char, 1, 0,

@@ -4,7 +4,9 @@
 #include <iostream>
 
 int mode;
-bool check_pressed;
+long double begin_switch_mode;
+
+bool check_pressed, go_pressed, go_allowed;
 
 using namespace std;
 
@@ -27,52 +29,13 @@ void get_triangle(int idx, point* &res) {
     return;
 }
 
-bool check(field& r, ship* b) {
+bool check() {
+    cout << "hey" << endl;
+    time_last_check = curr_time;
+    bombs_removed = false;
     check_pressed = true;    
 }
-/*
-bool check(field& r, ship* b) {
-    r.bombs.clear();
-    int used[amount_of_polygons];
-    bool may_be_near[amount_of_polygons];
-    for (int i = 0; i < amount_of_polygons; i++) {
-        used[i] = -1;
-        may_be_near[i] = true;
-    }
-    std::cout << "checking begin!\n";
-    for (int i = 0; i < amount_of_ships; i++) {
-        for (int j = 0; j < b[i].strength; j++) {
-            point curr_centre = b[i].get_point(j);
-            curr_centre.x -= r.move.m[2];
-            curr_centre.y -= r.move.m[5];
-            int k = get_cell_idx(curr_centre);
-            if (k == -1) {
-                continue;
-            }
-            if (used[k] != -1 and used[k] != i) {
-                r.bombs.push_back(k);
-            }
-            used[k] = i;
-            may_be_near[k] = false;
-            vec neighbour(0, 45);
-            for (int m = 0; m < 6; m++) {
-                point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
-                k = get_cell_idx(curr_neighbour);
-                if (k == -1) {
-                    continue;
-                }
-                if (!may_be_near[k] and used[k] != i) {
-                    r.bombs.push_back(k);
-                }
-                if (used[k] == -1) {
-                    used[k] = i;
-                }
-            }
-        }
-    }
-    return (r.bombs.empty());
-}
-*/
+
 bool turn(int x, int y, field& r, ship* b) {
     
     for (int i = 0; i < amount_of_ships; i++) {

@@ -7,7 +7,7 @@ using namespace std;
 
 int WINDOW_WIDTH, WINDOW_HEIGHT;
 unsigned int vbo, ibo_buffer, program, menu;
-unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, aa, any_texture_loc;
+unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, tex_coord_loc, any_texture_loc, shadowing_loc;
 polygon* Field;
 Matrix3f World;
 Matrix3f Camera;
@@ -35,7 +35,7 @@ current_ship_color[] = {0.7, 0, 0.4, 1,
                       };
 
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
-bool bombs_removed, window_should_close = false, play_audio = true, turning = false;
+bool bombs_removed, window_should_close = false, play_audio = true, turning = false, check_result = true;
 int cnt;
 long double curr_time;
 long long time_last_check;
@@ -73,7 +73,7 @@ void PressEvent(unsigned char key, int x, int y) {
     } else if (key == 13) {
         time_last_check = time(NULL);
         bombs_removed = false;
-        check(field1, ships);
+        check();
 
     } else if (key == ' ') {
         turning = true;
@@ -201,13 +201,21 @@ void SpecialEvent(int key, int, int) {
 
 static void RenderSceneCB()
 { 
-    update_net();
-    curr_time = time(NULL);
+    curr_time = (float)clock() / CLOCKS_PER_SEC;
+    //cout << turning << ' ' << go_pressed << ' ' << go_allowed << ' ' << check_pressed << endl;
+    if (go_allowed) {
+        cout << 1 << endl;
+        turning = 1;
+        begin_switch_mode = curr_time;
+        go_pressed = go_allowed = 0;
+    }
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.5, 0.5, 0.5, 0);
+    long double shadowing = min(1.0, fabs((float)SWITCH_DUR - (curr_time - begin_switch_mode) / (float)SWITCH_DUR));
+    glUniform1f(shadowing_loc, shadowing);
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
     draw_background();
@@ -234,6 +242,7 @@ static void RenderSceneCB()
 //  Test zone
 //end of test zone
 
+    update_net();
     glutSwapBuffers();
 }
  
@@ -260,7 +269,8 @@ void init_resourses() {
     f_color_loc = glGetUniformLocation(program, "f_color");
     tex_loc = glGetUniformLocation(program, "tex");
     any_texture_loc = glGetUniformLocation(program, "using_textures");
-    aa = glGetAttribLocation(program, "tex_coord");
+    shadowing_loc = glGetUniformLocation(program, "shadowing");
+    tex_coord_loc = glGetAttribLocation(program, "tex_coord");
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -320,6 +330,7 @@ int main(int argc, char** argv)
     //SOIL_free_image_data(image);
     if (init_net("127.0.0.1", PORT)) {
         cout << "connection failed" << endl;
+        return 1;
     }
     while (!window_should_close) {
         glutMainLoop();

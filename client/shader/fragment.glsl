@@ -1,7 +1,7 @@
 uniform vec4 f_color;
 uniform sampler2D tex;
 uniform int using_textures;
-//uniform float shadowing;
+uniform float shadowing;
 varying vec3 new_c;
 varying vec2 new_tex_coord;
 
@@ -14,5 +14,6 @@ void main(void) {
         gl_FragColor = vec4(col.r, col.r, col.r, col.r);
 //        gl_FragColor = texture2D(tex, new_tex_coord) + vec4(new_tex_coord.x / 2, new_tex_coord.y / 2, 0.5, 1);
     }
-//    gl_FragColor.rgba *= shadowing;
+    gl_FragColor.rgba *= (shadowing);
+
 }

@@ -89,9 +89,11 @@ int init_net(const char *hostname, unsigned short port) {
             my_number = message[1];
         } else {
             printf("Failed to connect: bad answer: %d %d \n", (int)message[0], (int)message[1]);
+            return 1;
         }
     } else {
         printf("Failed to connect: no answer\n");
+        return 1;
     }
     return 0;
 
@@ -115,8 +117,8 @@ int update_net() {
                 printf("%d ", (int)*c);
             }
             printf("\n");
-            check_pressed = false;
         }
+        check_pressed = false;
         sendto(local_udp_socket, message, ptr - message, 0, (sockaddr *)&server, server_addrlen); 
         int msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_WAITALL, (sockaddr *) &server, &server_addrlen);
         if (message[0] != OK or message[1] != my_number) {
@@ -125,6 +127,11 @@ int update_net() {
         field1.bombs.resize(message[2]);
         for (int i = 0; i < message[2]; i++) {
             field1.bombs[i] = message[3 + i];
+        }
+        check_result = (message[2] == 0);
+        if (go_pressed) {
+            go_pressed = false;
+            go_allowed = check_result;
         }
     }
 }

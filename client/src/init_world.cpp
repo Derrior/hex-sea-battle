@@ -81,14 +81,16 @@ void init_buttons() {
     button b2(100, 670, n2);
     button b3(320, 50, name_go);
     b1.register_callback([&time_last_check, &bombs_removed](){
-        time_last_check = time(NULL);
-        bombs_removed = false;
-        check(field1, ships);
+        check();
     });
     b2.register_callback([](){
         colorscheme = (colorscheme + 1) % AMOUNT_COLORSCHEMES;
     });
     b3.size = 1.5;
+    b3.register_callback([&check_pressed, &go_pressed](){
+        check();
+        go_pressed = true;
+    });
     buttons.push_back(b1);
     buttons.push_back(b2);
     buttons.push_back(b3);

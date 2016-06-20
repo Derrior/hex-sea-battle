@@ -28,7 +28,7 @@ extern int WINDOW_WIDTH;
 extern int WINDOW_HEIGHT;
 #define CONST_SPEED_CAMERA 20
 extern unsigned int vbo, ibo_buffer, program, menu;
-extern unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, any_texture_loc;
+extern unsigned int f_color_loc, world_loc, coord_loc, angle_loc, camera_loc, scale_loc, tex_loc, any_texture_loc, shadowing_loc;
 extern long double curr_time;
 extern polygon* Field;
 extern Matrix3f World;
@@ -41,16 +41,14 @@ extern int mouse_x, mouse_y;
 extern float field_color[], white_color[], black_color[];
 extern float ship_color[], current_ship_color[];
 extern float bomb_color[], aqua_color[];
-extern int cnt;
 extern int colorscheme;
 extern GLuint tex_a[128];
 extern background bg;
 extern SDL_AudioSpec wav_spec;
-extern bool window_should_close, play_audio, turning;
+extern bool window_should_close, play_audio, turning, bombs_removed, check_result;
 extern std::vector<button> buttons;
 extern long long time_last_check;
-extern bool bombs_removed;
-extern unsigned int aa;
+extern unsigned int tex_coord_loc;
 extern float world_scale;
 #endif //GL_H
 

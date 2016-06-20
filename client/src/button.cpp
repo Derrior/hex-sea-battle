@@ -44,7 +44,7 @@ void button::call_callback() {
         return;
     }
     callback();
-    last_time_activated = time(NULL);
+    last_time_activated = curr_time;
 }
 
 void button::register_callback(function<void()> t) {
