@@ -8,6 +8,7 @@ button::button() {
     name = "";
     p = gen_cell(point(), 40);
     callback = NULL;
+    size = 1;
     registered_any_callbacks = false;
 }
 
@@ -16,6 +17,7 @@ button::button(int x, int y) {
     name = "";
     p = gen_cell(point(), 40);
     callback = NULL;
+    size = 1;
     registered_any_callbacks = false;
 }
 
@@ -24,6 +26,7 @@ button::button(int x, int y, string &_name) {
     name = _name;
     p = gen_cell(point(), 40);
     callback = NULL;
+    size = 1;
     registered_any_callbacks = false;
 }
 

@@ -76,9 +76,10 @@ void init_audio() {
 }
 
 void init_buttons() {
-    string name = "check!", n2 = "switch";
+    string name = "check", n2 = "switch", name_go = "Go";
     button b1(200, 50, name);
     button b2(100, 670, n2);
+    button b3(320, 50, name_go);
     b1.register_callback([&time_last_check, &bombs_removed](){
         time_last_check = time(NULL);
         bombs_removed = false;
@@ -87,6 +88,8 @@ void init_buttons() {
     b2.register_callback([](){
         colorscheme = (colorscheme + 1) % AMOUNT_COLORSCHEMES;
     });
+    b3.size = 1.5;
     buttons.push_back(b1);
     buttons.push_back(b2);
+    buttons.push_back(b3);
 }

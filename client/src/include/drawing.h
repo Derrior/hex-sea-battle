@@ -5,7 +5,7 @@
 #include <string>
 #include <gl.h>
 
-void draw_text(point pos, std::string& text);
+void draw_text(point pos, std::string& text, float size=1);
 void draw_cell(int cell_idx, const float* color, field& F);
 void draw_cell(int cell_idx);
 void draw_background();

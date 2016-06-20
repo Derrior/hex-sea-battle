@@ -9,6 +9,7 @@ struct button {
     std::string name;
     std::function<void()> callback;
     point place;
+    float size;
     bool registered_any_callbacks;
     long double last_time_activated;
     button();

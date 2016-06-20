@@ -5,8 +5,8 @@
 
 using namespace std;
 
-void draw_text(point pos, string& text) {
-    float size = 0.7;
+void draw_text(point pos, string& text, float size) {
+    size *= 0.7;
     glActiveTexture(GL_TEXTURE1);
     glUniform1i(any_texture_loc, 1);
     glUniform1f(scale_loc, size);
@@ -170,7 +170,8 @@ void draw_buttons() {
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glDisableVertexAttribArray(0);
-        draw_text(point((buttons[i].place.x - 6.5 * buttons[i].name.length()), buttons[i].place.y - 1 * buttons[i].name.length()), buttons[i].name);
+        float font_size = buttons[i].size;
+        draw_text(point((buttons[i].place.x - 7 * font_size * buttons[i].name.length()), buttons[i].place.y - 7 * font_size), buttons[i].name, font_size);
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniform1f(scale_loc, world_scale);
