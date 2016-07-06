@@ -2,6 +2,8 @@
 #define	MATH_3D_H
 #include <cstring>
 
+#define EPS 0.01
+
 struct Matrix3f {
     float m[9];
     Matrix3f() {

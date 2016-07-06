@@ -2,13 +2,11 @@
 #define GL_H
 
 #include <GL/glew.h>
-#include <music_player.h>
 #include <GL/freeglut.h>
 #include <background.h>
 #include <init_world.h>
 #include <math_3d.h>
 #include <polygon.h>
-#include <shader.h>
 #include <button.h>
 #include <iostream>
 #include <engine.h>
@@ -42,7 +40,6 @@ extern int cnt;
 extern int colorscheme;
 extern GLuint tex_a[128];
 extern background bg;
-extern SDL_AudioSpec wav_spec;
 extern bool window_should_close, play_audio, turning;
 extern std::vector<button> buttons;
 extern long long time_last_check;

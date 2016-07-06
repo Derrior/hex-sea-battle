@@ -76,6 +76,14 @@ void init_audio() {
 }
 
 void init_buttons() {
+    mode = INIT_MODE;
+    buttons.resize(3);
+    buttons[0].resize(1);
+    buttons[0][0] = button(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, "Go");
+    buttons[0][0].register_callback([&go_pressed]() {
+        go_pressed = true;
+    });
+    
     string name = "check", n2 = "switch", name_go = "Go";
     button b1(200, 50, name);
     button b2(100, 670, n2);
@@ -87,11 +95,11 @@ void init_buttons() {
         colorscheme = (colorscheme + 1) % AMOUNT_COLORSCHEMES;
     });
     b3.size = 1.5;
-    b3.register_callback([&check_pressed, &go_pressed](){
+    b3.register_callback([&go_pressed](){
         check();
         go_pressed = true;
     });
-    buttons.push_back(b1);
-    buttons.push_back(b2);
-    buttons.push_back(b3);
+    buttons[1].push_back(b1);
+    buttons[1].push_back(b2);
+    buttons[1].push_back(b3);
 }

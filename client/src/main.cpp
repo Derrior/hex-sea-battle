@@ -35,14 +35,30 @@ current_ship_color[] = {0.7, 0, 0.4, 1,
                       };
 
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
-bool bombs_removed, window_should_close = false, play_audio = true, turning = false, check_result = true;
+bool bombs_removed, window_should_close = false, play_audio = true, check_result = true;
 int cnt;
 long double curr_time;
 long long time_last_check;
+bool need_next_mode, active_buttons = true;
 background bg;
-vector<button> buttons;
+vector<vector<button> > buttons;
 SDL_AudioSpec wav_spec;
 
+
+void next_mode() {
+    switch (mode) {
+    case INIT_MODE:
+        mode = SHIP_MODE;
+        break;
+    case SHIP_MODE:
+        mode = BATTLE_MODE;
+        break;
+    case BATTLE_MODE:
+        mode = INIT_MODE;
+        break;
+    }
+    cout << "Current mode - " << mode << endl;
+}
 
 void PressEvent(unsigned char key, int x, int y) {
     y = 768 - y;
@@ -76,7 +92,6 @@ void PressEvent(unsigned char key, int x, int y) {
         check();
 
     } else if (key == ' ') {
-        turning = true;
         curr_ship = -1;
     } else if (key == '-') {
         world_scale *= 0.95;
@@ -87,16 +102,18 @@ void PressEvent(unsigned char key, int x, int y) {
 
 void MouseEvent(int button, int state, int x, int y) {
     y = 768 - y;
-    for (int i = 0; i < (int)buttons.size(); i++) {
-        if (buttons[i].is_pressed(point(x, y))) {
-            buttons[i].call_callback();
-            cout << "try to catch" << endl;
-            return;
+    if (active_buttons) {
+        for (int i = 0; i < (int)buttons[mode].size(); i++) {
+            if (buttons[mode][i].is_pressed(point(x, y))) {
+                buttons[mode][i].call_callback();
+                cout << "try to catch" << endl;
+                return;
+            }
         }
     }
     x -= Camera.m[2];
     y -= Camera.m[5];
-    if (!turning) {
+    if (mode == SHIP_MODE) {
         if (button == GLUT_RIGHT_BUTTON and state == GLUT_DOWN) {
             if (curr_ship == -1) {
                 for (int i = 0; i < amount_of_ships; i++) {
@@ -146,8 +163,8 @@ void MotionEvent(int x, int y) {
         ships[curr_ship].pos.m[2] += x - mouse_x;
         ships[curr_ship].pos.m[5] += mouse_y - y;
     } else {
-        Camera.m[2] += 2 * (x - mouse_x);
-        Camera.m[5] += 2 * (mouse_y - y);
+        Camera.m[2] += (x - mouse_x);
+        Camera.m[5] += (mouse_y - y);
     }
     mouse_x = x;
     mouse_y = y;
@@ -158,8 +175,8 @@ void PassiveMotionEvent(int x, int y) {
 
     if (x < 0 or x > WINDOW_WIDTH) return;
     if (y < 0 or y > WINDOW_HEIGHT) return;
-    for (int i = 0; i < (int)buttons.size(); i++) {
-	if (distance_m((buttons[i].place), point(x, y)) < 100) {
+    for (int i = 0; i < (int)buttons[mode].size(); i++) {
+	if (distance_m((buttons[mode][i].place), point(x, y)) < 100) {
         y = 768 - y;
         mouse_x = x;
         mouse_y = y;
@@ -199,53 +216,69 @@ void SpecialEvent(int key, int, int) {
     curr_ship %= amount_of_ships;
 }
 
-static void RenderSceneCB()
-{ 
+
+
+static void update_all() {
     curr_time = (float)clock() / CLOCKS_PER_SEC;
-    //cout << turning << ' ' << go_pressed << ' ' << go_allowed << ' ' << check_pressed << endl;
-    if (go_allowed) {
-        cout << 1 << endl;
-        turning = 1;
-        begin_switch_mode = curr_time;
-        go_pressed = go_allowed = 0;
-    }
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.5, 0.5, 0.5, 0);
-    long double shadowing = min(1.0, fabs((float)SWITCH_DUR - (curr_time - begin_switch_mode) / (float)SWITCH_DUR));
-    glUniform1f(shadowing_loc, shadowing);
-    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    draw_background();
-    draw_field(field1);
-    draw_field(field2);
-    
-    for (int i = 0; i < amount_of_ships; i++) {
-        if (i != curr_ship)
-        draw_ship(i, ship_color + 4 * colorscheme);
+
+    if (go_allowed) {
+        cout << 1 << endl;
+        begin_switch_mode = curr_time;
+        go_pressed = go_allowed = 0;
+        need_next_mode = true;
+        active_buttons = false;
     }
-    if (!turning) {
+    if (need_next_mode and SWITCH_DUR - (curr_time - begin_switch_mode) < EPS) {
+        next_mode();
+        need_next_mode = false;
+        active_buttons = true;
+    }
+
+    if (mode == SHIP_MODE) {
         if (!bombs_removed and (long long)curr_time - time_last_check > BOMB_CONST) {
             field1.bombs.clear();
             field2.bombs.clear();
             bombs_removed = true;
         }
     }
-    draw_bombs(field1);
-    draw_bombs(field2);
-    draw_buttons();
-    if (curr_ship != -1) {
-        draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
+    update_net();
+}
+ 
+
+static void RenderSceneCB()
+{ 
+    update_all();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.5, 0.5, 0.5, 0);
+    long double shadowing = min(1.0, fabs(((float)SWITCH_DUR - (curr_time - begin_switch_mode)) / (float)SWITCH_DUR));
+    glUniform1f(shadowing_loc, shadowing);
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+    draw_background();
+    if (mode != INIT_MODE) {
+        draw_field(field1);
+        draw_field(field2);
+        
+        for (int i = 0; i < amount_of_ships; i++) {
+            if (i != curr_ship)
+            draw_ship(i, ship_color + 4 * colorscheme);
+        }
+        draw_bombs(field1);
+        draw_bombs(field2);
+        if (curr_ship != -1) {
+            draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
+        }
     }
+    draw_buttons();
 //  Test zone
 //end of test zone
 
-    update_net();
     glutSwapBuffers();
 }
- 
+
 static void InitializeGlutCallbacks() {
     glutDisplayFunc(RenderSceneCB);
     glutIdleFunc(RenderSceneCB);

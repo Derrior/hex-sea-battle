@@ -151,9 +151,9 @@ void draw_bombs(field& F) {
 
 void draw_buttons() {
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
-    for (int i = 0; i < (int)buttons.size(); i++) {
-        World.m[2] = buttons[i].place.x;
-        World.m[5] =  buttons[i].place.y;
+    for (int i = 0; i < (int)buttons[mode].size(); i++) {
+        World.m[2] = buttons[mode][i].place.x;
+        World.m[5] =  buttons[mode][i].place.y;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
         glUniform1f(scale_loc, 1.5);
@@ -164,8 +164,8 @@ void draw_buttons() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
         glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
-        float font_size = buttons[i].size;
-        draw_text(point((buttons[i].place.x - 7 * font_size * buttons[i].name.length()), buttons[i].place.y - 7 * font_size), buttons[i].name, font_size);
+        float font_size = buttons[mode][i].size;
+        draw_text(point((buttons[mode][i].place.x - 7 * font_size * buttons[mode][i].name.length()), buttons[mode][i].place.y - 7 * font_size), buttons[mode][i].name, font_size);
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniform1f(scale_loc, world_scale);

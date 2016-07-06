@@ -19,4 +19,5 @@ int check(field& r, ship* b);
 
 bool turn(int x, int y, field& r, ship* b);
 
+void next_mode(int &mode); 
 #endif //ENGINE_H

@@ -12,13 +12,14 @@
 
 #define MSG_HELLO 0
 #define MSG_CHECK 1
+#define MSG_GO 2
 
 #define OK 1
 
 struct client_t {
     field F;
     ship* ships;
-    char num;
+    int num, mode;
     char alive;
     client_t();
     client_t(int n);

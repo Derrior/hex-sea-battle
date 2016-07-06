@@ -65,12 +65,14 @@ using namespace std;
 
 client_t::client_t() {
     ships = new ship[amount_of_ships];
+    mode = 0;
     alive = 1;
 }
 
 
 client_t::client_t(int n) {
     ships = new ship[amount_of_ships];
+    mode = 0;
     alive = 1;
     num = n;
 }
@@ -112,12 +114,34 @@ int init_net() {
     return 0;
 }
 
+int check_query() {
+    if (clients.size() <= message[1] or message[1] < 0) {
+        return 1;
+    }
+    clients[message[1]].fill_in(message + 2);
+
+    message[2] = check(clients[message[1]].F, clients[message[1]].ships);
+    for (int i = 0; i < message[2]; i++) {
+        message[i + 3] = clients[message[1]].F.bombs[i];
+    }
+    message[3 + message[2]] = 0;
+    // output of all message only for debug
+    /*
+    cout << ' ' << message<< endl;
+    for (int i = 0; i < msg_len; i++) {
+        cout << (int)message[i] << ' ';
+    }
+    cout << endl;
+    */
+    return 0;
+
+}
+
 int update_net() {
     sockaddr_in src_addr;
     socklen_t addrlen = sizeof(src_addr);
     memset(&src_addr, 0, sizeof(src_addr));
     int msg_len = 0, client_sock;
-    int cnt = 1;
     /*
     SOCKET client_socket = accept(local_tcp_socket, (sockaddr*)&src_addr, &addrlen);
     if (client_socket > 0) {
@@ -141,25 +165,17 @@ int update_net() {
             client_count++;
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_CHECK) {
-            if (clients.size() <= message[1] or message[1] < 0) {
-                continue;
-            }
-            clients[message[1]].fill_in(message + 2);
-
-            message[2] = check(clients[message[1]].F, clients[message[1]].ships);
-            for (int i = 0; i < message[2]; i++) {
-                message[i + 3] = clients[message[1]].F.bombs[i];
-            }
-            message[3 + message[2]] = 0;
+            message[0] = OK;
+            check_query();
             sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
-            // output of all message only for debug
-            /*
-            cout << ' ' << message<< endl;
-            for (int i = 0; i < msg_len; i++) {
-                cout << (int)message[i] << ' ';
+        } else if (message[0] == MSG_GO) {
+            message[0] = OK;
+            check_query();
+            if (message[2] == 0) {
+                next_mode(clients[message[1]].mode);
+                cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
             }
-            cout << endl;
-            */
+            sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
         }
     }
     return 0;

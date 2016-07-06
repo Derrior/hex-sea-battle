@@ -45,10 +45,11 @@ extern int colorscheme;
 extern GLuint tex_a[128];
 extern background bg;
 extern SDL_AudioSpec wav_spec;
-extern bool window_should_close, play_audio, turning, bombs_removed, check_result;
-extern std::vector<button> buttons;
+extern bool window_should_close, play_audio, bombs_removed, check_result;
+extern std::vector<std::vector<button> > buttons;
 extern long long time_last_check;
 extern unsigned int tex_coord_loc;
 extern float world_scale;
 #endif //GL_H
+void next_mode();
 

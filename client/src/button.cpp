@@ -21,7 +21,7 @@ button::button(int x, int y) {
     registered_any_callbacks = false;
 }
 
-button::button(int x, int y, string &_name) {
+button::button(int x, int y, const string &_name) {
     place = point(x, y);
     name = _name;
     p = gen_cell(point(), 40);

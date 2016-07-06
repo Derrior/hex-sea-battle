@@ -3,7 +3,6 @@
 #include <math.h>
 #include <iostream>
 
-int mode;
 
 using namespace std;
 
@@ -127,4 +126,15 @@ bool turn(int x, int y, field& r, ship* b) {
         r.aqua.push_back(cell_idx);
     }
     return true;
+}
+
+void next_mode(int &mode) {
+    if (mode == INIT_MODE) {
+        mode = SHIP_MODE;
+    } else if (mode == SHIP_MODE) {
+        mode = BATTLE_MODE;
+    } else {
+        mode = INIT_MODE;   
+    }
+
 }

@@ -14,7 +14,7 @@ struct button {
     long double last_time_activated;
     button();
     button(int x, int y);
-    button(int x, int y, std::string &_name);
+    button(int x, int y, const std::string &_name);
     bool is_pressed(point click);
     void call_callback();
     void register_callback(std::function<void()> t);
