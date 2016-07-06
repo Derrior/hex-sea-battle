@@ -1,11 +1,12 @@
 #include <drawing.h>
+#include <engine.h>
 #include <field.h>
 #include <ft.h>
 #include <gl.h>
 
 using namespace std;
 
-void draw_text(point pos, string& text, float size) {
+void draw_text(point pos, const string& text, float size) {
     size *= 0.4;
     glActiveTexture(GL_TEXTURE1);
     glUniform1i(any_texture_loc, 1);
@@ -17,6 +18,7 @@ void draw_text(point pos, string& text, float size) {
     
     World.m[2] = pos.x;
     World.m[5] = pos.y;
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
     float buff_data[4][4];
     buff_data[0][2] = 0;
     buff_data[0][3] = 1;
@@ -30,7 +32,6 @@ void draw_text(point pos, string& text, float size) {
     buff_data[3][2] = 0;
     buff_data[3][3] = 0;
 
-    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
     for (int i = 0; i < len; i++) {
         float x_pos1 = (x_pos + test[text[i]].bearing_x);
         float y_pos1 = (y_pos - test[text[i]].size_y + test[text[i]].bearing_y);
@@ -169,4 +170,34 @@ void draw_buttons() {
     }
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniform1f(scale_loc, world_scale);
+}
+
+void draw_name() {
+    glUniform1f(scale_loc, world_scale);
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
+    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+    draw_text(point(200, 600), name, 1);
+}
+
+void draw_candidates() {
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
+    for (int i = 0; i < (int)candidates.size(); i++) {
+        World.m[2] = 200 + (i % 10) * 100;
+        World.m[5] = 500 - (i + (i / 10) * 100);
+        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+        glUniform1f(scale_loc, 1.5);
+        glUniform4fv(f_color_loc, 1, aqua_color);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+        glDisableVertexAttribArray(0);
+        float font_size = 1;
+        draw_text(point((World.m[2] - 7 * font_size * candidates[i].name_len), World.m[5] - 7 * font_size), candidates[i].name, font_size);
+    }
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+    glUniform1f(scale_loc, world_scale);
+    
 }

@@ -67,6 +67,7 @@ client_t::client_t() {
     ships = new ship[amount_of_ships];
     mode = 0;
     alive = 1;
+    memset(name, 0, 128);
 }
 
 
@@ -75,6 +76,16 @@ client_t::client_t(int n) {
     mode = 0;
     alive = 1;
     num = n;
+    memset(name, 0, 128);
+}
+
+client_t::client_t(int n, int battle) {
+    ships = new ship[amount_of_ships];
+    mode = 0;
+    alive = 1;
+    num = n;
+    battle_idx = battle;
+    memset(name, 0, 128);
 }
 
 void client_t::fill_in(char *src) {
@@ -136,6 +147,21 @@ int check_query() {
     return 0;
 
 }
+int update_query() {
+    message[0] = OK;
+    message[2] = client_count - 1;
+    
+    char* ptr = message + 3;
+    for (int i = 0; i < client_count; i++) {
+        if (i == message[1]) {
+            continue;
+        }
+        *ptr = clients[i].name_len;
+        memcpy(ptr + 1, clients[i].name, *ptr);
+        ptr += (*ptr) + 1;
+    }
+    return ptr - message;
+}
 
 int update_net() {
     sockaddr_in src_addr;
@@ -160,9 +186,13 @@ int update_net() {
     while ((msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_DONTWAIT, (sockaddr *) &src_addr, &addrlen)) > 0) {
         if (message[0] == MSG_HELLO) {
             message[0] = OK;
-            message[1] = client_count;
             clients.push_back(client_t(client_count));
+            clients.back().name_len = message[1];
+            memcpy(clients.back().name, message + 2, message[1]);
+            message[1] = client_count;
+            cout << "client named " << clients.back().name << " connected, users: " << client_count + 1 << endl;
             client_count++;
+            
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_CHECK) {
             message[0] = OK;
@@ -176,6 +206,15 @@ int update_net() {
                 cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
             }
             sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
+        } else if (message[0] == MSG_SHOT) {
+            if (clients[message[1]].mode != BATTLE_MODE) {
+                message[0] = 0;
+            } else {
+                message[0] = OK;
+            }
+        } else if (message[0] == MSG_UPDATE) {
+            int msg_size = update_query();
+            sendto(local_udp_socket, message, msg_size + 1, 0, (sockaddr *)&src_addr, addrlen);
         }
     }
     return 0;

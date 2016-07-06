@@ -5,14 +5,14 @@
 #include <music_player.h>
 #include <GL/freeglut.h>
 #include <background.h>
-#include <init_world.h>
 #include <math_3d.h>
 #include <polygon.h>
 #include <drawing.h>
-#include <shader.h>
 #include <button.h>
-#include <iostream>
 #include <engine.h>
+#include <iostream>
+#include <player.h>
+#include <shader.h>
 #include <field.h>
 #include <geom.h>
 #include <cstdio>
@@ -47,9 +47,13 @@ extern background bg;
 extern SDL_AudioSpec wav_spec;
 extern bool window_should_close, play_audio, bombs_removed, check_result;
 extern std::vector<std::vector<button> > buttons;
+extern std::vector<player> candidates;
+extern player opponent;
 extern long long time_last_check;
 extern unsigned int tex_coord_loc;
 extern float world_scale;
-#endif //GL_H
+extern char name[128];
 void next_mode();
+
+#endif //GL_H
 

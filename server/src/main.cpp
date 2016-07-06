@@ -41,6 +41,7 @@ long double curr_time;
 long long time_last_check;
 background bg;
 vector<button> buttons;
+vector<battle> battles;
 /*
 
 void PressEvent(unsigned char key, int x, int y) {

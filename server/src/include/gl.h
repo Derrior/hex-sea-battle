@@ -8,6 +8,7 @@
 #include <math_3d.h>
 #include <polygon.h>
 #include <button.h>
+#include <battle.h>
 #include <iostream>
 #include <engine.h>
 #include <field.h>
@@ -46,5 +47,6 @@ extern long long time_last_check;
 extern bool bombs_removed;
 extern unsigned int aa;
 extern float world_scale;
+extern std::vector<battle> battles;
 #endif //GL_H
 

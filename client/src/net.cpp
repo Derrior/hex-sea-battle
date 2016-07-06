@@ -56,6 +56,7 @@ using namespace std;
 char message[BUFF_LEN];
 SOCKET local_udp_socket;
 int my_number;
+long double last_upd_time;
 sockaddr_in server;
 unsigned int server_addrlen;
 
@@ -97,14 +98,15 @@ int init_net(const char *hostname, unsigned short port) {
         return 1;
 
     }*/
-    message[0] = 0;
-    message[1] = 'e';
-    message[2] = 'l';
-    message[3] = 'l';
-    sendto(local_udp_socket, message, 4, 0, (struct sockaddr *)&server, server_addrlen); 
+    int name_len = strlen(name);
+    message[0] = MSG_HELLO;
+    message[1] = name_len;
+    memcpy(message + 2, name, name_len);
+    sendto(local_udp_socket, message, 2 + name_len, 0, (struct sockaddr *)&server, server_addrlen); 
     int msg_len = 0;
     if ((msg_len = recvfrom_timeout()) > 0) {
-        if (message[0] == OK) {
+        if (message[0] == OK and msg_len == 2) {
+            
             my_number = message[1];
         } else {
             printf("Failed to connect: bad answer: %d %d \n", (int)message[0], (int)message[1]);
@@ -136,6 +138,9 @@ int check_query(char type) {
     }
     sendto(local_udp_socket, message, ptr - message, 0, (sockaddr *)&server, server_addrlen); 
     int msg_len = recvfrom_timeout();
+    if (msg_len == -1) {
+        return 1;
+    }
     cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
     if (message[0] != OK or message[1] != my_number) {
         return 1;
@@ -148,21 +153,94 @@ int check_query(char type) {
     return 0;
 }
 
+int shoot_query() {
+    message[0] = MSG_SHOT;
+    message[1] = my_number;
+    message[2] = shoot_cell;
+    sendto(local_udp_socket, message, 3, 0, (sockaddr *)&server, server_addrlen); 
+    int msg_len = recvfrom_timeout();
+    if (msg_len == -1) {
+        return 1;
+    }
+    cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
+    if (message[0] != OK or message[1] != my_number) {
+        return 1;
+    }
+    if (message[2]) {
+        char* ptr = message + 3;
+        field2.bombs.resize(*ptr);
+        ptr++;
+        for (int i = 0; i < message[3]; i++, ptr++) {
+            field2.bombs[i] = *ptr;
+        }
+        field2.aqua.resize(*ptr);
+        ptr++;
+        for (int i = 0; i < (int)field2.aqua.size(); i++, ptr++) {
+            field2.aqua[i] = *ptr;
+        }
+    }
+    return 0;
+}
+
+int update_query() {
+    message[0] = MSG_UPDATE;
+    message[1] = my_number;
+    sendto(local_udp_socket, message, 2, 0, (sockaddr *)&server, server_addrlen); 
+    int msg_len = recvfrom_timeout();
+    if (msg_len <= 0 or message[0] != OK) {
+        return 1;
+    }
+
+    if (mode == INIT_MODE) {
+        candidates.resize(message[2]);
+        char* ptr = message + 3;
+        for (int i = 0; i < (int)candidates.size(); i++) {
+            memcpy(candidates[i].name, ptr + 1, *ptr);
+            candidates[i].name_len = *ptr;
+            ptr += (*ptr);
+            ptr++;
+        }
+    } else if (mode == SHIP_MODE) {
+        opponent.is_ready = message[2];
+    }
+}
+
 int update_net() {
+    if (curr_time - last_upd_time > BETWEEN_UPDATES) {
+        if (update_query()) {
+            cout << "network error - update" << endl;
+            return 1;
+        }
+        last_upd_time = curr_time;
+
+    }
     if (check_pressed) {
         printf("here\n");
         if (check_query(MSG_CHECK)) {
+            cout << "network error - check" << endl;
             return 1;
         }
     }
     if (go_pressed) {
-        if (check_query(MSG_GO)) {
-            cout << "network error" << endl;
+        if (mode == INIT_MODE) {
+            go_allowed = true;
+        } else if (mode == SHIP_MODE) {
+            if (check_query(MSG_GO)) {
+                cout << "network error - go" << endl;
+                return 1;
+            }
+            go_allowed = check_result;        
+        } else {
+            go_allowed = false;
+        }
+    }
+    if (shoot_pressed) {
+        if (shoot_query()) {
+            cout << "network error - shot" << endl;
             return 1;
         }
-        go_allowed = check_result;        
     }
-    check_pressed = go_pressed = 0;
+    check_pressed = go_pressed = shoot_pressed = 0;
 }
 int free_net() {
 //    closesocket(local_tcp_socket);

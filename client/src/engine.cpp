@@ -1,12 +1,13 @@
 #include <gl.h>
 #include <ship.h>
 #include <math.h>
+#include <player.h>
 #include <iostream>
 
 int mode;
 long double begin_switch_mode;
-
-bool check_pressed, go_pressed, go_allowed;
+char shoot_cell;
+bool check_pressed, go_pressed, go_allowed, shoot_pressed;
 
 using namespace std;
 

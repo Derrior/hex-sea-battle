@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef MUSIC_PLAYER_H
+#define MUSIC_PLAYER_H
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_audio.h>
@@ -17,4 +17,4 @@ int sdl_init();
 
 
 void my_audio_callback(void *, Uint8 *stream, int len);
-#endif //PLAYER_H
+#endif //MUSIC_PLAYER_H

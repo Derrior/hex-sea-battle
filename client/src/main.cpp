@@ -1,5 +1,6 @@
 #include <net.h>
 #include <SOIL/SOIL.h>
+#include <init_world.h>
 #include <gl.h>
 #include <ctime>
 #include <iostream>
@@ -35,6 +36,7 @@ current_ship_color[] = {0.7, 0, 0.4, 1,
                       };
 
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
+char name[128];
 bool bombs_removed, window_should_close = false, play_audio = true, check_result = true;
 int cnt;
 long double curr_time;
@@ -42,6 +44,8 @@ long long time_last_check;
 bool need_next_mode, active_buttons = true;
 background bg;
 vector<vector<button> > buttons;
+vector<player> candidates;
+player opponent;
 SDL_AudioSpec wav_spec;
 
 
@@ -144,15 +148,12 @@ void MouseEvent(int button, int state, int x, int y) {
             ships[curr_ship].pos.m[5] = y;
             curr_ship = -1;
         }
-    } else {
+    } else if (mode == BATTLE_MODE) {
         if (button == GLUT_LEFT_BUTTON and state == GLUT_UP) {
-            x -= field1.move.m[2];
-            y -= field1.move.m[5];
-            if (!field1.used[get_cell_idx(point(x, y))]) {
-                turn(x, y, field1, ships);
-                field1.used[get_cell_idx(point(x, y))] = true;
-            }
-
+            x -= field2.move.m[2];
+            y -= field2.move.m[5];
+            shoot_pressed = true;
+            shoot_cell = get_cell_idx(point(x, y));
         }
     }
     
@@ -258,6 +259,7 @@ static void RenderSceneCB()
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
     draw_background();
+    
     if (mode != INIT_MODE) {
         draw_field(field1);
         draw_field(field2);
@@ -271,8 +273,12 @@ static void RenderSceneCB()
         if (curr_ship != -1) {
             draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
         }
+    } else {
+        draw_candidates();
     }
     draw_buttons();
+
+    draw_name();
 //  Test zone
 //end of test zone
 
@@ -323,6 +329,17 @@ int main(int argc, char** argv)
     curr_time = time(NULL);
     sdl_init();
     init_audio();
+    cout << argc << endl;
+
+    if (argc == 2) {
+        int name_len = strlen(argv[1]);
+        name[name_len] = 0;
+        memcpy(name, argv[1], name_len);
+    } else {
+        int name_len = 7;
+        name[name_len] = 0;
+        memcpy(name, "abacaba", name_len);
+    }
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);

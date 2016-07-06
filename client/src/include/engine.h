@@ -14,7 +14,8 @@
 
 extern int mode;
 extern long double begin_switch_mode;
-extern bool check_pressed, go_pressed, go_allowed;
+extern char shoot_cell;
+extern bool check_pressed, go_pressed, go_allowed, shoot_pressed;
 
 int get_cell_idx(point a);
 
