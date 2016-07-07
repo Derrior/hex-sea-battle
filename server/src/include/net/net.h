@@ -17,6 +17,7 @@
 #define MSG_SHOT  3
 #define MSG_SURRENDER 4
 #define MSG_UPDATE 5
+#define MAX_NOT_UPDATE 5
 
 #define OK 1
 
@@ -24,8 +25,10 @@ struct client_t {
     field F;
     ship* ships;
     char name[128];
+    long double last_update;
     int num, mode, battle_idx, name_len;
     char alive;
+
     client_t();
     client_t(int n);
     client_t(int n, int battle);

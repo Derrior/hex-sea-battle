@@ -48,7 +48,7 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
-
+#include <set>
 
 #define MAX_CLIENTS 256
 #define PORT 22123
@@ -114,7 +114,9 @@ char message[BUFF_LEN];
 
 SOCKET local_udp_socket;
 int client_count;
-vector<client_t> clients;
+client_t clients[128];
+set<int> unused_numbers;
+bool is_unused_number[128];
 
 int init_net() {
     local_udp_socket = make_local_udp_socket(PORT);
@@ -122,11 +124,15 @@ int init_net() {
         printf("Error while initializing network: cannot make local tcp socket");
         return 1;
     }
+    for (int i = 0; i < 128; i++) {
+        unused_numbers.insert(i);
+        is_unused_number[i] = true;
+    }
     return 0;
 }
 
 int check_query() {
-    if (clients.size() <= message[1] or message[1] < 0) {
+    if (128 <= message[1] or message[1] < 0 or is_unused_number[message[1]]) {
         return 1;
     }
     clients[message[1]].fill_in(message + 2);
@@ -186,12 +192,16 @@ int update_net() {
     while ((msg_len = recvfrom(local_udp_socket, message, BUFF_LEN, MSG_DONTWAIT, (sockaddr *) &src_addr, &addrlen)) > 0) {
         if (message[0] == MSG_HELLO) {
             message[0] = OK;
-            clients.push_back(client_t(client_count));
-            clients.back().name_len = message[1];
-            memcpy(clients.back().name, message + 2, message[1]);
-            message[1] = client_count;
-            cout << "client named " << clients.back().name << " connected, users: " << client_count + 1 << endl;
+            int curr_client_num = *unused_numbers.begin();
+            clients[curr_client_num] = client_t(curr_client_num);
+            clients[curr_client_num].name_len = message[1];
+            memcpy(clients[curr_client_num].name, message + 2, message[1]);
+            message[1] = curr_client_num;
+            clients[curr_client_num].last_update = curr_time;
+            cout << "client named " << clients[curr_client_num].name << " connected, users: " << client_count + 1 << endl;
             client_count++;
+            is_unused_number[curr_client_num] = false;
+            unused_numbers.erase(unused_numbers.begin());
             
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_CHECK) {
@@ -213,8 +223,17 @@ int update_net() {
                 message[0] = OK;
             }
         } else if (message[0] == MSG_UPDATE) {
+            clients[message[1]].last_update = curr_time;
             int msg_size = update_query();
             sendto(local_udp_socket, message, msg_size + 1, 0, (sockaddr *)&src_addr, addrlen);
+        }
+    }
+    for (int i = 0; i < 128; i++) {
+        if (!is_unused_number[i] and curr_time - clients[i].last_update > MAX_NOT_UPDATE) {
+            printf("client number %d disconnected\n", clients[i].num);
+            unused_numbers.insert(clients[i].num);
+            is_unused_number[i] = true;
+            client_count--;
         }
     }
     return 0;

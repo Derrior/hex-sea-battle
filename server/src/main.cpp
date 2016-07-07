@@ -201,7 +201,6 @@ void SpecialEvent(int key, int, int) {
 
 static void RenderSceneCB()
 { 
-    curr_time = time(NULL);
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
@@ -285,6 +284,7 @@ int main(int argc, char** argv)
     //glEnable(GL_TEXTURE_2D);
     init_net();
     while (1) {
+        curr_time = time(NULL);
         update_net();
     }
     return 0;
