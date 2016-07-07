@@ -182,17 +182,17 @@ void draw_name() {
 void draw_candidates() {
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
     for (int i = 0; i < (int)candidates.size(); i++) {
-        World.m[2] = 200 + (i % 10) * 100;
-        World.m[5] = 500 - (i + (i / 10) * 100);
+        World.m[2] = WINDOW_WIDTH / 2;
+        World.m[5] = 500 - i * 60;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform1f(scale_loc, 1.5);
-        glUniform4fv(f_color_loc, 1, aqua_color);
+        glUniform1f(scale_loc, 1);
+        glUniform4fv(f_color_loc, 1, bomb_color);
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, rect_vbo);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect_ibo);
+        glDrawElements(GL_TRIANGLES, rect_ibo_size, GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
         float font_size = 1;
         draw_text(point((World.m[2] - 7 * font_size * candidates[i].name_len), World.m[5] - 7 * font_size), candidates[i].name, font_size);

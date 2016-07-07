@@ -363,6 +363,7 @@ int main(int argc, char** argv)
     */
     init_matrixes();
     init_ship_object();
+    init_rect_object();
     init_fields();
     init_colors();
     init_buttons();
