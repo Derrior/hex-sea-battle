@@ -38,12 +38,13 @@ current_ship_color[] = {0.7, 0, 0.4, 1,
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 char name[128];
 bool bombs_removed, window_should_close = false, play_audio = true, check_result = true;
-int cnt;
-long double curr_time;
-long long time_last_check;
+int fps_counter;
+long double curr_time, last_fps_update;
+long double time_last_check;
 bool need_next_mode, active_buttons = true;
 background bg;
 vector<vector<button> > buttons;
+vector<button> candidates_buttons;
 vector<player> candidates;
 player opponent;
 SDL_AudioSpec wav_spec;
@@ -114,6 +115,16 @@ void MouseEvent(int button, int state, int x, int y) {
                 return;
             }
         }
+    }
+    if (mode == INIT_MODE) {
+        for (int i = 0; i < (int)candidates_buttons.size(); i++) {
+            if (candidates_buttons[i].is_pressed(point(x, y))) {
+                candidates_buttons[i].call_callback();
+                cout << "try to catch" << endl;
+                return;
+            }
+        }
+
     }
     x -= Camera.m[2];
     y -= Camera.m[5];
@@ -224,7 +235,7 @@ static void update_all() {
     WINDOW_HEIGHT = glutGet(GLUT_WINDOW_HEIGHT);
     WINDOW_WIDTH = glutGet(GLUT_WINDOW_WIDTH);
     PassiveMotionEvent(mouse_x, mouse_y);
-
+    update_net();
     if (go_allowed) {
         cout << 1 << endl;
         begin_switch_mode = curr_time;
@@ -245,7 +256,7 @@ static void update_all() {
             bombs_removed = true;
         }
     }
-    update_net();
+    fps_counter++;
 }
  
 
@@ -259,6 +270,13 @@ static void RenderSceneCB()
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
     draw_background();
+    if (curr_time - last_fps_update >= 1) {
+        char buff[120] = {};
+        sprintf(buff, "%d", fps_counter);
+        printf("%s\n", buff);
+        last_fps_update = curr_time;
+        fps_counter = 0;
+    }
     
     if (mode != INIT_MODE) {
         draw_field(field1);
@@ -372,13 +390,6 @@ int main(int argc, char** argv)
     create_field_vbo();
     cout << "created" << endl;
     init_resourses();
-    //glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    int width, height;
-    //unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGBA);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    //SOIL_free_image_data(image);
     if (init_net("127.0.0.1", PORT)) {
         cout << "connection failed" << endl;
         return 1;

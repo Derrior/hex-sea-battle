@@ -4,10 +4,10 @@
 #include <player.h>
 #include <iostream>
 
-int mode;
+int mode, best_opponent;
 long double begin_switch_mode;
 char shoot_cell;
-bool check_pressed, go_pressed, go_allowed, shoot_pressed;
+bool check_pressed, go_pressed, go_allowed, shoot_pressed, best_opponent_changed;
 
 using namespace std;
 

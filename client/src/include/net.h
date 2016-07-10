@@ -6,6 +6,7 @@
 #define MSG_SHOT  3
 #define MSG_SURRENDER 4
 #define MSG_UPDATE 5
+#define MSG_BOC   6
 
 #define BETWEEN_UPDATES 0.5
 

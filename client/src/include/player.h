@@ -4,6 +4,7 @@
 struct player {
     int name_len;
     char name[128];
+    char want_to_play;
     bool is_ready;
 };
 

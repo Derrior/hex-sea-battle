@@ -150,7 +150,7 @@ int check_query() {
     }
     cout << endl;
     */
-    return 0;
+    return message[2] + 4;
 
 }
 int update_query() {
@@ -165,8 +165,38 @@ int update_query() {
         *ptr = clients[i].name_len;
         memcpy(ptr + 1, clients[i].name, *ptr);
         ptr += (*ptr) + 1;
+        *ptr = 0;
+        if (clients[i].best_opponent == message[1]) {
+            *ptr = 1;
+        } else if (clients[message[1]].best_opponent == i) {
+            *ptr = 2;
+        }
+        ptr++;
     }
     return ptr - message;
+}
+
+int BOC_query() {
+    message[0] = OK;
+    int i, cnt = 0;
+    for (i = 0; i < 128 and cnt <= message[2]; i++) {
+        if (is_unused_number[i]) {
+            continue;
+        }
+        if (i != message[1]) {
+            cnt++;
+        }
+    }
+    i--;
+    if (is_unused_number[i]) {
+        message[0] = 0;
+    } else {
+        clients[message[1]].best_opponent = i;
+
+    }
+
+    cout << (int)message[1] << ' ' << (int)message[2] << ' ' << i << endl;
+    return 2;
 }
 
 int update_net() {
@@ -206,16 +236,16 @@ int update_net() {
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_CHECK) {
             message[0] = OK;
-            check_query();
-            sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
+            int msg_len = check_query();
+            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_GO) {
             message[0] = OK;
-            check_query();
+            int msg_len = check_query();
             if (message[2] == 0) {
                 next_mode(clients[message[1]].mode);
                 cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
             }
-            sendto(local_udp_socket, message, message[2] + 4, 0, (sockaddr *)&src_addr, addrlen);
+            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_SHOT) {
             if (clients[message[1]].mode != BATTLE_MODE) {
                 message[0] = 0;
@@ -224,8 +254,12 @@ int update_net() {
             }
         } else if (message[0] == MSG_UPDATE) {
             clients[message[1]].last_update = curr_time;
-            int msg_size = update_query();
-            sendto(local_udp_socket, message, msg_size + 1, 0, (sockaddr *)&src_addr, addrlen);
+            int msg_len = update_query();
+            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
+        } else if (message[0] == MSG_BOC) {
+            int msg_len = BOC_query();
+            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
+
         }
     }
     for (int i = 0; i < 128; i++) {

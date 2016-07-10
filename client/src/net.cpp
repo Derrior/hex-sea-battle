@@ -199,10 +199,25 @@ int update_query() {
             candidates[i].name_len = *ptr;
             ptr += (*ptr);
             ptr++;
+            candidates[i].want_to_play = *ptr;
+            ptr++;
         }
     } else if (mode == SHIP_MODE) {
         opponent.is_ready = message[2];
     }
+    return 0;
+}
+
+int BOC_query() {
+    message[0] = MSG_BOC;
+    message[1] = my_number;
+    message[2] = best_opponent;
+    sendto(local_udp_socket, message, 3, 0, (sockaddr *)&server, server_addrlen); 
+    int msg_len = recvfrom_timeout();
+    if (msg_len <= 0 or message[0] != OK) {
+        return 1;
+    }
+    return 0;
 }
 
 int update_net() {
@@ -211,6 +226,17 @@ int update_net() {
             cout << "network error - update" << endl;
             return 1;
         }
+        if (mode == INIT_MODE) {
+            candidates_buttons.resize(candidates.size());
+            for (int i = 0; i < (int)candidates.size(); i++) {
+                candidates_buttons[i] = button(WINDOW_WIDTH / 2, 500 - i * 70, string(candidates[i].name), BUTTON_RECT);
+                candidates_buttons[i].register_callback([i]() {
+                    best_opponent = i;
+                    best_opponent_changed = true;
+                });
+            }
+        }
+
         last_upd_time = curr_time;
 
     }
@@ -240,8 +266,17 @@ int update_net() {
             return 1;
         }
     }
-    check_pressed = go_pressed = shoot_pressed = 0;
+    if (mode == INIT_MODE and best_opponent_changed) {
+        if (BOC_query()) {
+            cout << "network error - BOC" << endl;
+            return 1;
+        }
+
+    }
+    best_opponent_changed = check_pressed = go_pressed = shoot_pressed = 0;
+    return 0;
 }
 int free_net() {
 //    closesocket(local_tcp_socket);
+    return 0;
 }

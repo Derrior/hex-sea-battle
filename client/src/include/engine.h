@@ -12,10 +12,10 @@
 #define BATTLE_MODE 2
 #define OTHER_MODE 3
 
-extern int mode;
+extern int mode, best_opponent;
 extern long double begin_switch_mode;
 extern char shoot_cell;
-extern bool check_pressed, go_pressed, go_allowed, shoot_pressed;
+extern bool check_pressed, go_pressed, go_allowed, shoot_pressed, best_opponent_changed;
 
 int get_cell_idx(point a);
 
