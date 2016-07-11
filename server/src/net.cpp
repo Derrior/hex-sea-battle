@@ -68,6 +68,7 @@ client_t::client_t() {
     mode = 0;
     alive = 1;
     memset(name, 0, 128);
+    best_opponent = -1;
 }
 
 
@@ -77,6 +78,7 @@ client_t::client_t(int n) {
     alive = 1;
     num = n;
     memset(name, 0, 128);
+    best_opponent = -1;
 }
 
 client_t::client_t(int n, int battle) {
@@ -86,6 +88,7 @@ client_t::client_t(int n, int battle) {
     num = n;
     battle_idx = battle;
     memset(name, 0, 128);
+    best_opponent = -1;
 }
 
 void client_t::fill_in(char *src) {
@@ -132,8 +135,8 @@ int init_net() {
 }
 
 int check_query() {
-    if (message[1] < 0 or is_unused_number[message[1]]) {
-        return 1;
+    if (message[1] < 0 or is_unused_number[message[1]] or clients[message[1]].mode != SHIP_MODE) {
+        return -1;
     }
     clients[message[1]].fill_in(message + 2);
 
@@ -142,6 +145,7 @@ int check_query() {
         message[i + 3] = clients[message[1]].F.bombs[i];
     }
     message[3 + message[2]] = 0;
+    clients[message[1]].can_go = (message[2] == 0);
     // output of all message only for debug
     /*
     cout << ' ' << message<< endl;
@@ -158,17 +162,20 @@ int update_query() {
     message[2] = client_count - 1;
     
     char* ptr = message + 3;
-    for (int i = 0; i < client_count; i++) {
-        if (i == message[1]) {
+    for (int i = 0; i < 128; i++) {
+        if (i == message[1] or is_unused_number[i]) {
             continue;
         }
         *ptr = clients[i].name_len;
         memcpy(ptr + 1, clients[i].name, *ptr);
         ptr += (*ptr) + 1;
         *ptr = 0;
-        if (clients[i].best_opponent == message[1]) {
+        bool cond1 = clients[i].best_opponent == message[1], cond2 = clients[message[1]].best_opponent == i;
+        if (cond1 and cond2) {
+            *ptr = 3;
+        } else if (cond1) {
             *ptr = 1;
-        } else if (clients[message[1]].best_opponent == i) {
+        } else if (cond2) {
             *ptr = 2;
         }
         ptr++;
@@ -195,7 +202,7 @@ int BOC_query() {
 
     }
 
-    cout << (int)message[1] << ' ' << (int)message[2] << ' ' << i << endl;
+    cout << "player number " << (int)message[1] << " say bo is " << (int)message[2] << "; for us is :" << i << endl;
     return 2;
 }
 
@@ -232,30 +239,34 @@ int update_net() {
             client_count++;
             is_unused_number[curr_client_num] = false;
             unused_numbers.erase(unused_numbers.begin());
-            
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
+
         } else if (message[0] == MSG_CHECK) {
             message[0] = OK;
             msg_len = check_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
+
         } else if (message[0] == MSG_GO) {
             message[0] = OK;
-            msg_len = check_query();
-            if (message[2] == 0) {
+            message[2] = clients[message[1]].can_go;
+            if (clients[message[1]].can_go) {
                 next_mode(clients[message[1]].mode);
                 cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
             }
-            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
+            sendto(local_udp_socket, message, 3, 0, (sockaddr *)&src_addr, addrlen);
+
         } else if (message[0] == MSG_SHOT) {
             if (clients[message[1]].mode != BATTLE_MODE) {
                 message[0] = 0;
             } else {
                 message[0] = OK;
             }
+
         } else if (message[0] == MSG_UPDATE) {
             clients[message[1]].last_update = curr_time;
             msg_len = update_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
+
         } else if (message[0] == MSG_BOC) {
             msg_len = BOC_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);

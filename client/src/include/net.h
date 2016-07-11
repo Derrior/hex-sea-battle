@@ -8,7 +8,7 @@
 #define MSG_UPDATE 5
 #define MSG_BOC   6
 
-#define BETWEEN_UPDATES 0.5
+#define BETWEEN_UPDATES 0.125
 
 #define OK 1
 #define BUFF_LEN 1024 * 1024

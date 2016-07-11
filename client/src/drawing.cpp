@@ -157,7 +157,6 @@ void draw_buttons() {
         World.m[5] =  buttons[mode][i].place.y;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform1f(scale_loc, 1.5);
         glUniform4fv(f_color_loc, 1, aqua_color);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
@@ -176,7 +175,18 @@ void draw_name() {
     glUniform1f(scale_loc, world_scale);
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    draw_text(point(200, 600), name, 1);
+    World.m[2] = 200;
+    World.m[5] = 600;
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+    glUniform4fv(f_color_loc, 1, candidates_color);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, rect_vbo);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect_ibo);
+    glDrawElements(GL_TRIANGLES, rect_ibo_size, GL_UNSIGNED_INT, 0);
+    glDisableVertexAttribArray(0);
+    draw_text(point(200 - 7 * name.length(), 600 - 7), name, 1);
 }
 
 void draw_candidates() {
@@ -184,17 +194,11 @@ void draw_candidates() {
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
     for (int i = 0; i < (int)candidates_buttons.size(); i++) {
         World.m[2] = candidates_buttons[i].place.x;
-        World.m[5] =  candidates_buttons[i].place.y;
+        World.m[5] = candidates_buttons[i].place.y;
         glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
         glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform1f(scale_loc, 1.5);
-        if (candidates[i].want_to_play == 2) {
-            glUniform4fv(f_color_loc, 1, bomb_color);
-        } else if (candidates[i].want_to_play == 1) {
-            glUniform4fv(f_color_loc, 1, field_color + 4);
-        } else {
-            glUniform4fv(f_color_loc, 1, aqua_color);
-        }
+        glUniform4fv(f_color_loc, 1, candidates_color + 4 * candidates[i].want_to_play);
+        glUniform1f(scale_loc, candidates_buttons[i].size);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, rect_vbo);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);

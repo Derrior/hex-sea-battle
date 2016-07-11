@@ -98,10 +98,12 @@ int init_net(const char *hostname, unsigned short port) {
         return 1;
 
     }*/
-    int name_len = strlen(name);
+    int name_len = name.length();
     message[0] = MSG_HELLO;
     message[1] = name_len;
-    memcpy(message + 2, name, name_len);
+    for (int i = 0; i < name_len; i++) {
+        message[2 + i] = name[i];
+    }
     sendto(local_udp_socket, message, 2 + name_len, 0, (struct sockaddr *)&server, server_addrlen); 
     int msg_len = 0;
     if ((msg_len = recvfrom_timeout()) > 0) {
@@ -119,9 +121,9 @@ int init_net(const char *hostname, unsigned short port) {
     return 0;
 }
 
-int check_query(char type) {
+int check_query() {
     char* ptr = message + 2;
-    message[0] = type;
+    message[0] = MSG_CHECK;
     message[1] = my_number;
     ptr = field1.print_field(ptr);        
     for (char* c = message + 2; c != ptr; c++) {
@@ -150,6 +152,18 @@ int check_query(char type) {
         field1.bombs[i] = message[3 + i];
     }
     check_result = (message[2] == 0);
+    return 0;
+}
+
+int go_query() {
+    message[0] = MSG_GO;
+    message[1] = my_number;
+    sendto(local_udp_socket, message, 2, 0, (sockaddr *)&server, server_addrlen); 
+    int msg_len = recvfrom_timeout();
+    if (msg_len == -1) {
+        return 1;
+    }
+    go_allowed = message[2];
     return 0;
 }
 
@@ -229,7 +243,7 @@ int update_net() {
         if (mode == INIT_MODE) {
             candidates_buttons.resize(candidates.size());
             for (int i = 0; i < (int)candidates.size(); i++) {
-                candidates_buttons[i] = button(WINDOW_WIDTH / 2, 500 - i * 70, string(candidates[i].name), BUTTON_RECT);
+                candidates_buttons[i] = button(WINDOW_WIDTH / 2, 500 - i * 70, string(candidates[i].name), 1.5, BUTTON_RECT);
                 candidates_buttons[i].register_callback([i]() {
                     best_opponent = i;
                     best_opponent_changed = true;
@@ -242,22 +256,15 @@ int update_net() {
     }
     if (check_pressed) {
         printf("here\n");
-        if (check_query(MSG_CHECK)) {
+        if (check_query()) {
             cout << "network error - check" << endl;
             return 1;
         }
     }
     if (go_pressed) {
-        if (mode == INIT_MODE) {
-            go_allowed = true;
-        } else if (mode == SHIP_MODE) {
-            if (check_query(MSG_GO)) {
-                cout << "network error - go" << endl;
-                return 1;
-            }
-            go_allowed = check_result;        
-        } else {
-            go_allowed = false;
+        if (go_query()) {
+            cout << "network error - go" << endl;
+            return 1;
         }
     }
     if (shoot_pressed) {

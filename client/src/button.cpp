@@ -76,16 +76,16 @@ button::button(int x, int y, int type) {
     registered_any_callbacks = false;
 }
 
-button::button(int x, int y, const string &_name, int type) {
+button::button(int x, int y, const string &_name, float _size, int type) {
+    size = _size;
     place = point(x, y);
     name = _name;
     if (type == BUTTON_HEX) {
-        p = gen_cell(point(), 40);
+        p = gen_cell(point(), 40 * size);
     } else if (type == BUTTON_RECT) {
-        p = gen_rect(point(), 20);
+        p = gen_rect(point(), 20 * size);
     }
     callback = NULL;
-    size = 1;
     registered_any_callbacks = false;
 }
 

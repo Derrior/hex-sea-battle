@@ -22,7 +22,7 @@ struct button {
     long double last_time_activated;
     button(int type = BUTTON_HEX);
     button(int x, int y, int type = BUTTON_HEX);
-    button(int x, int y, const std::string &_name, int type = BUTTON_HEX);
+    button(int x, int y, const std::string &_name, float _size = 1, int type = BUTTON_HEX);
     bool is_pressed(point click);
     void call_callback();
     void register_callback(std::function<void()> t);

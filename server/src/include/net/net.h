@@ -7,6 +7,7 @@
 #include <field.h>
 #include <ship.h>
 #include <gl.h>
+#include <set>
 
 
 #define BUFF_LEN 1024 * 1024
@@ -29,7 +30,7 @@ struct client_t {
     char name[128];
     long double last_update;
     int num, mode, battle_idx, name_len, best_opponent;
-    bool alive;
+    bool alive, can_go;
 
     client_t();
     client_t(int n);
@@ -38,6 +39,10 @@ struct client_t {
 };
 
 
+extern int client_count;
+extern client_t clients[128];
+extern std::set<int> unused_numbers;
+extern bool is_unused_number[128];
 int init_net();
 
 int update_net();

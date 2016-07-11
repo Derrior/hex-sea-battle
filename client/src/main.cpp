@@ -35,8 +35,13 @@ current_ship_color[] = {0.7, 0, 0.4, 1,
                         0.2, 0.2, 0.6, 1
                       };
 
+float candidates_color[] = {0, 0, 0, 0.4,
+                            0, 0.3, 0.9, 0.6,
+                            0.7, 0.6, 0, 0.6,
+                            0.1, 0.7, 0.1, 0.8
+                            };
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
-char name[128];
+string name;
 bool bombs_removed, window_should_close = false, play_audio = true, check_result = true;
 int fps_counter;
 long double curr_time, last_fps_update;
@@ -350,13 +355,10 @@ int main(int argc, char** argv)
     cout << argc << endl;
 
     if (argc == 2) {
-        int name_len = strlen(argv[1]);
-        name[name_len] = 0;
-        memcpy(name, argv[1], name_len);
+        name = argv[1];
+
     } else {
-        int name_len = 7;
-        name[name_len] = 0;
-        memcpy(name, "abacaba", name_len);
+        name = "abacaba";
     }
 
     glutInit(&argc, argv);
