@@ -128,13 +128,13 @@ bool turn(int x, int y, field& r, ship* b) {
     return true;
 }
 
-void next_mode(int &mode) {
-    if (mode == INIT_MODE) {
-        mode = SHIP_MODE;
-    } else if (mode == SHIP_MODE) {
-        mode = BATTLE_MODE;
+void next_mode(int &our_mode) {
+    if (our_mode == INIT_MODE) {
+        our_mode = SHIP_MODE;
+    } else if (our_mode == SHIP_MODE) {
+        our_mode = BATTLE_MODE;
     } else {
-        mode = INIT_MODE;   
+        our_mode = INIT_MODE;   
     }
 
 }

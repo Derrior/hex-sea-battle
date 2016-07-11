@@ -9,7 +9,6 @@ void init_matrixes() {
         matrixes[i][1] = -sinf(i * (M_PI / 3));
         matrixes[i][2] = -matrixes[i][1];
     }
-    world_scale = 1;
 }
 
 void set_ship(int& x, int& y, field& F) {
@@ -30,11 +29,6 @@ void create_field_vbo() {
     {
         draw_polygon(Field[i], points, i * 7, ibo);
     }
-    unsigned int ibo_data[ibo.size()];
-    for (int i = 0; i < (int)ibo.size(); i++) {
-        ibo_data[i] = ibo[i];
-    }
-    ibo_size = ibo.size();
     create_ships();
     //glutSetCursor(0, 0);
 }
@@ -43,8 +37,6 @@ void create_field_vbo() {
 void init_fields() {
     Field = gen_field(10, 10, 1);
     amount_of_polygons = 100;
-    World.m[2] = -100;
-    World.m[5] = -100;
     field1 = field(amount_of_polygons);
     field2 = field(amount_of_polygons);
     field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
@@ -68,18 +60,3 @@ void init_audio() {
 
 }
 */
-void init_buttons() {
-    string name = "check!", n2 = "switch";
-    button b1(200, 50, name);
-    button b2(100, 670, n2);
-    b1.register_callback([&time_last_check, &bombs_removed](){
-        time_last_check = time(NULL);
-        bombs_removed = false;
-        check(field1, ships);
-    });
-    b2.register_callback([](){
-        colorscheme = (colorscheme + 1) % AMOUNT_COLORSCHEMES;
-    });
-    buttons.push_back(b1);
-    buttons.push_back(b2);
-}

@@ -89,7 +89,7 @@ client_t::client_t(int n, int battle) {
 }
 
 void client_t::fill_in(char *src) {
-    char * prev_src = src;
+    //char * prev_src = src;
     src = F.write_field(src);
     /* debug output
     for (char * c = prev_src; c != src; c++) {
@@ -98,7 +98,7 @@ void client_t::fill_in(char *src) {
     cout << endl;
     */
     for (int i = 0; i < amount_of_ships; i++) {
-        prev_src = src;
+        //prev_src = src;
         src = ships[i].write_ship(src);    
         /* debug output
         for (char * c = prev_src; c != src; c++) {
@@ -132,7 +132,7 @@ int init_net() {
 }
 
 int check_query() {
-    if (128 <= message[1] or message[1] < 0 or is_unused_number[message[1]]) {
+    if (message[1] < 0 or is_unused_number[message[1]]) {
         return 1;
     }
     clients[message[1]].fill_in(message + 2);
@@ -203,7 +203,7 @@ int update_net() {
     sockaddr_in src_addr;
     socklen_t addrlen = sizeof(src_addr);
     memset(&src_addr, 0, sizeof(src_addr));
-    int msg_len = 0, client_sock;
+    int msg_len = 0;
     /*
     SOCKET client_socket = accept(local_tcp_socket, (sockaddr*)&src_addr, &addrlen);
     if (client_socket > 0) {
@@ -236,11 +236,11 @@ int update_net() {
             sendto(local_udp_socket, message, 2, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_CHECK) {
             message[0] = OK;
-            int msg_len = check_query();
+            msg_len = check_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_GO) {
             message[0] = OK;
-            int msg_len = check_query();
+            msg_len = check_query();
             if (message[2] == 0) {
                 next_mode(clients[message[1]].mode);
                 cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
@@ -254,10 +254,10 @@ int update_net() {
             }
         } else if (message[0] == MSG_UPDATE) {
             clients[message[1]].last_update = curr_time;
-            int msg_len = update_query();
+            msg_len = update_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_BOC) {
-            int msg_len = BOC_query();
+            msg_len = BOC_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
 
         }
