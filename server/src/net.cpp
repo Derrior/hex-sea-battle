@@ -68,6 +68,7 @@ client_t::client_t() {
     mode = 0;
     alive = 1;
     memset(name, 0, 128);
+    can_go = 0;
     best_opponent = -1;
 }
 
@@ -78,6 +79,7 @@ client_t::client_t(int n) {
     alive = 1;
     num = n;
     memset(name, 0, 128);
+    can_go = 0;
     best_opponent = -1;
 }
 
@@ -88,6 +90,7 @@ client_t::client_t(int n, int battle) {
     num = n;
     battle_idx = battle;
     memset(name, 0, 128);
+    can_go = 0;
     best_opponent = -1;
 }
 
@@ -159,27 +162,32 @@ int check_query() {
 }
 int update_query() {
     message[0] = OK;
-    message[2] = client_count - 1;
-    
     char* ptr = message + 3;
-    for (int i = 0; i < 128; i++) {
-        if (i == message[1] or is_unused_number[i]) {
-            continue;
+    if (clients[message[1]].mode == INIT_MODE) {
+        message[2] = client_count - 1;
+        
+        for (int i = 0; i < 128; i++) {
+            if (i == message[1] or is_unused_number[i]) {
+                continue;
+            }
+            *ptr = clients[i].name_len;
+            memcpy(ptr + 1, clients[i].name, *ptr);
+            ptr += (*ptr) + 1;
+            *ptr = 0;
+            bool cond1 = clients[i].best_opponent == message[1], cond2 = clients[message[1]].best_opponent == i;
+            if (cond1 and cond2) {
+                *ptr = 3;
+            } else if (cond1) {
+                *ptr = 1;
+            } else if (cond2) {
+                *ptr = 2;
+            }
+            ptr++;
         }
-        *ptr = clients[i].name_len;
-        memcpy(ptr + 1, clients[i].name, *ptr);
-        ptr += (*ptr) + 1;
-        *ptr = 0;
-        bool cond1 = clients[i].best_opponent == message[1], cond2 = clients[message[1]].best_opponent == i;
-        if (cond1 and cond2) {
-            *ptr = 3;
-        } else if (cond1) {
-            *ptr = 1;
-        } else if (cond2) {
-            *ptr = 2;
-        }
-        ptr++;
     }
+    *ptr = clients[message[1]].can_go;
+    ptr++;
+    clients[message[1]].can_go = false;
     return ptr - message;
 }
 

@@ -242,7 +242,7 @@ static void update_all() {
     PassiveMotionEvent(mouse_x, mouse_y);
     update_net();
     if (go_allowed) {
-        cout << 1 << endl;
+        cout << "go_allowed" << endl;
         begin_switch_mode = curr_time;
         go_pressed = go_allowed = 0;
         need_next_mode = true;

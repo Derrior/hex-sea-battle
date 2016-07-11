@@ -59,7 +59,7 @@ button::button(int type) {
         p = gen_rect(point(), 20);
     }
     callback = NULL;
-    size = 1;
+    size = font_size = 1;
     registered_any_callbacks = false;
 }
 
@@ -72,12 +72,13 @@ button::button(int x, int y, int type) {
         p = gen_rect(point(), 20);
     }
     callback = NULL;
-    size = 1;
+    size = font_size = 1;
     registered_any_callbacks = false;
 }
 
 button::button(int x, int y, const string &_name, float _size, int type) {
     size = _size;
+    font_size = 1;
     place = point(x, y);
     name = _name;
     if (type == BUTTON_HEX) {

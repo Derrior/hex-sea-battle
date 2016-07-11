@@ -79,11 +79,11 @@ void init_audio() {
 void init_buttons() {
     mode = INIT_MODE;
     buttons.resize(3);
-    buttons[0].resize(0);
     string name_b1 = "check", name_b2 = "switch", name_b3 = "Go";
-    button b1(200, 50, name_b1);
-    button b2(100, 670, name_b2);
-    button b3(320, 50, name_b3);
+    button b1(200, 50, name_b1, 1.5);
+    button b2(100, 670, name_b2, 1.5);
+    button b3(320, 50, name_b3, 1.5);
+    
     b1.register_callback([](){
         check();
     });

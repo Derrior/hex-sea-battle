@@ -163,7 +163,6 @@ int go_query() {
     if (msg_len == -1) {
         return 1;
     }
-    go_allowed = message[2];
     return 0;
 }
 
@@ -216,8 +215,11 @@ int update_query() {
             candidates[i].want_to_play = *ptr;
             ptr++;
         }
+        go_allowed = *ptr;
     } else if (mode == SHIP_MODE) {
         opponent.is_ready = message[2];
+        go_allowed = message[3];
+        cout << (int)message[3] << endl;
     }
     return 0;
 }
@@ -248,6 +250,7 @@ int update_net() {
                     best_opponent = i;
                     best_opponent_changed = true;
                 });
+                candidates_buttons[i].font_size = 1.5;
             }
         }
 

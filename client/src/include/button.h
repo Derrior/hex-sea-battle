@@ -17,7 +17,7 @@ struct button {
     std::string name;
     std::function<void()> callback;
     point place;
-    float size;
+    float font_size, size;
     bool registered_any_callbacks;
     long double last_time_activated;
     button(int type = BUTTON_HEX);

@@ -24,6 +24,10 @@ int update_all() {
         }
         if (clients[best_o].best_opponent == i) {
             clients[best_o].can_go = clients[i].can_go = true;
+            next_mode(clients[best_o].mode);
+            next_mode(clients[i].mode);
+        } else {
+            clients[i].can_go = false;
         }
     }
     return 0;
