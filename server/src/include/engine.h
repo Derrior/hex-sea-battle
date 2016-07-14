@@ -8,6 +8,7 @@
 #define SHIP_MODE 1
 #define BATTLE_MODE 2
 #define OTHER_MODE 3
+#define CELLS_AT_ALL 20
 
 extern int mode;
 

@@ -144,11 +144,12 @@ int check_query() {
     clients[message[1]].fill_in(message + 2);
 
     message[2] = check(clients[message[1]].F, clients[message[1]].ships);
-    for (int i = 0; i < message[2]; i++) {
-        message[i + 3] = clients[message[1]].F.bombs[i];
+    int bombs_am = clients[message[1]].F.bombs.size();
+    message[3] = bombs_am;
+    for (int i = 0; i < bombs_am; i++) {
+        message[i + 4] = clients[message[1]].F.bombs[i];
     }
-    message[3 + message[2]] = 0;
-    clients[message[1]].can_go = (message[2] == 0);
+    clients[message[1]].can_go = message[2];
     // output of all message only for debug
     /*
     cout << ' ' << message<< endl;
@@ -157,19 +158,20 @@ int check_query() {
     }
     cout << endl;
     */
-    return message[2] + 4;
+    return bombs_am + 4;;
 
 }
 int update_query() {
     message[0] = OK;
     char* ptr = message + 3;
     if (clients[message[1]].mode == INIT_MODE) {
-        message[2] = client_count - 1;
+        message[2] = 0;
         
         for (int i = 0; i < 128; i++) {
-            if (i == message[1] or is_unused_number[i]) {
+            if (i == message[1] or is_unused_number[i] or clients[i].mode != INIT_MODE) {
                 continue;
             }
+            message[2]++;
             *ptr = clients[i].name_len;
             memcpy(ptr + 1, clients[i].name, *ptr);
             ptr += (*ptr) + 1;

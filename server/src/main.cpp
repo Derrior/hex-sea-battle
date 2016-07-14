@@ -26,6 +26,7 @@ int update_all() {
             clients[best_o].can_go = clients[i].can_go = true;
             next_mode(clients[best_o].mode);
             next_mode(clients[i].mode);
+            battles.push_back(battle(i, best_o));
         } else {
             clients[i].can_go = false;
         }

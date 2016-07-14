@@ -61,7 +61,8 @@ void init_fields() {
 }
 
 void init_audio() {
-    if (!SDL_LoadWAV("sum.wav", &wav_spec, &wav_buffer,&wav_length)) {
+    if (!SDL_LoadWAV("sum.wav", &wav_spec, &wav_buffer, &wav_length)) {
+        cout << "Failed to load audio" << endl;
         play_audio = false;;
     };
     if (play_audio) {

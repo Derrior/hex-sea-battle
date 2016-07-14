@@ -33,6 +33,7 @@ int check(field& r, ship* b) {
         used[i] = -1;
         may_be_near[i] = true;
     }
+    int used_cell_am = 0;
     std::cout << "checking begin!\n";
     for (int i = 0; i < amount_of_ships; i++) {
         for (int j = 0; j < b[i].strength; j++) {
@@ -48,6 +49,7 @@ int check(field& r, ship* b) {
             }
             used[k] = i;
             may_be_near[k] = false;
+            used_cell_am++;
             vec neighbour(0, 45);
             for (int m = 0; m < 6; m++) {
                 point curr_neighbour = curr_centre + neighbour.rotate(matrixes[m]);
@@ -64,7 +66,7 @@ int check(field& r, ship* b) {
             }
         }
     }
-    return (r.bombs.size());
+    return (r.bombs.size() == 0) && used_cell_am == CELLS_AT_ALL;
 }
 
 bool turn(int x, int y, field& r, ship* b) {

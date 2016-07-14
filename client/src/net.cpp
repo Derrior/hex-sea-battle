@@ -147,11 +147,11 @@ int check_query() {
     if (message[0] != OK or message[1] != my_number) {
         return 1;
     }
-    field1.bombs.resize(message[2]);
-    for (int i = 0; i < message[2]; i++) {
-        field1.bombs[i] = message[3 + i];
+    field1.bombs.resize(message[3]);
+    for (int i = 0; i < message[3]; i++) {
+        field1.bombs[i] = message[4 + i];
     }
-    check_result = (message[2] == 0);
+    check_result = message[2];
     return 0;
 }
 
