@@ -14,7 +14,7 @@
 
 #define MSG_HELLO 0
 #define MSG_CHECK 1
-#define MSG_GO    2
+#define MSG_READY 2
 #define MSG_SHOT  3
 #define MSG_SURRENDER 4
 #define MSG_UPDATE 5
@@ -30,7 +30,7 @@ struct client_t {
     char name[128];
     long double last_update;
     int num, mode, battle_idx, name_len, best_opponent;
-    bool alive, can_go;
+    bool alive, field_correct, is_ready, can_go;
 
     client_t();
     client_t(int n);

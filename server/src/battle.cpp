@@ -11,3 +11,7 @@ battle::battle(int a, int b) {
     client_2 = b;
     idx = number_battles++; 
 }
+
+int battle::other(int client) {
+    return client_1 + client_2 - client;
+}

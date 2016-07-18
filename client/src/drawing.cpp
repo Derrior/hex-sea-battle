@@ -173,23 +173,31 @@ void draw_buttons() {
     glUniform1f(scale_loc, world_scale);
 }
 
-void draw_name() {
+void draw_rect(int x, int y, float* color) {
     glUniform1f(scale_loc, world_scale);
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Empty.m[0]);
     glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    World.m[2] = 200;
-    World.m[5] = 600;
+    World.m[2] = x;
+    World.m[5] = y;
     glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
-    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-    glUniform4fv(f_color_loc, 1, candidates_color);
+    glUniform4fv(f_color_loc, 1, color);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, rect_vbo);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect_ibo);
     glDrawElements(GL_TRIANGLES, rect_ibo_size, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
-    draw_text(point(200 - 7 * name.length(), 600 - 7), name, 1);
+
 }
+
+void draw_name() {
+    draw_rect(200, 600, candidates_color);
+
+    draw_text(point(200 - 7 * name.length(), 600 - 7), name, 1);
+    draw_rect(WINDOW_WIDTH / 2 - 100, 600, me_ready ? aqua_color : bomb_color);
+    draw_rect(WINDOW_WIDTH / 2 + 100, 600, opponent.is_ready ? aqua_color : bomb_color);
+}
+
 
 void draw_candidates() {
 

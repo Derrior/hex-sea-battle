@@ -46,7 +46,7 @@ extern int colorscheme;
 extern GLuint tex_a[128];
 extern background bg;
 extern SDL_AudioSpec wav_spec;
-extern bool window_should_close, play_audio, bombs_removed, check_result;
+extern bool window_should_close, play_audio, bombs_removed, check_result, me_ready;
 extern std::vector<std::vector<button> > buttons;
 extern std::vector<button> candidates_buttons;
 extern std::vector<player> candidates;

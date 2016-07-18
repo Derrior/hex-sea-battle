@@ -217,9 +217,10 @@ int update_query() {
         }
         go_allowed = *ptr;
     } else if (mode == SHIP_MODE) {
-        opponent.is_ready = message[2];
-        go_allowed = message[3];
-        cout << (int)message[3] << endl;
+        me_ready = message[2];
+        opponent.is_ready = message[3];
+        go_allowed = message[4];
+        message[4] = 0;
     }
     return 0;
 }

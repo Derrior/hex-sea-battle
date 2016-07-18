@@ -66,7 +66,7 @@ int check(field& r, ship* b) {
             }
         }
     }
-    return (r.bombs.size() == 0) && used_cell_am == CELLS_AT_ALL;
+    return (r.bombs.size() == 0);// && used_cell_am == CELLS_AT_ALL;
 }
 
 bool turn(int x, int y, field& r, ship* b) {

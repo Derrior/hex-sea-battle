@@ -42,7 +42,7 @@ float candidates_color[] = {0, 0, 0, 0.4,
                             };
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
 string name;
-bool bombs_removed, window_should_close = false, play_audio = true, check_result = true;
+bool bombs_removed, window_should_close = false, play_audio = true, check_result = true, me_ready;
 int fps_counter;
 long double curr_time, last_fps_update;
 long double time_last_check;

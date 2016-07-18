@@ -80,6 +80,11 @@ void init_audio() {
 void init_buttons() {
     mode = INIT_MODE;
     buttons.resize(3);
+    buttons[0].resize(1);
+    buttons[0][0] = button(100, 670, "Go", 1.5);
+    buttons[0][0].register_callback([](){
+        go_pressed = true;
+    });
     string name_b1 = "check", name_b2 = "switch", name_b3 = "Go";
     button b1(200, 50, name_b1, 1.5);
     button b2(100, 670, name_b2, 1.5);
@@ -96,6 +101,7 @@ void init_buttons() {
         check();
         go_pressed = true;
     });
+
     buttons[1].push_back(b1);
     buttons[1].push_back(b2);
     buttons[1].push_back(b3);

@@ -8,6 +8,7 @@ struct battle {
     int idx;
     battle();
     battle(int a, int b);
+    int other(int client);
 };
 
 #endif //BATTLE_H

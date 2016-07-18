@@ -149,7 +149,7 @@ int check_query() {
     for (int i = 0; i < bombs_am; i++) {
         message[i + 4] = clients[message[1]].F.bombs[i];
     }
-    clients[message[1]].can_go = message[2];
+    clients[message[1]].field_correct = message[2];
     // output of all message only for debug
     /*
     cout << ' ' << message<< endl;
@@ -163,9 +163,11 @@ int check_query() {
 }
 int update_query() {
     message[0] = OK;
-    char* ptr = message + 3;
+   
+    char* ptr = message + 2;
     if (clients[message[1]].mode == INIT_MODE) {
         message[2] = 0;
+        ptr++;
         
         for (int i = 0; i < 128; i++) {
             if (i == message[1] or is_unused_number[i] or clients[i].mode != INIT_MODE) {
@@ -186,9 +188,18 @@ int update_query() {
             }
             ptr++;
         }
+    } else if (clients[message[1]].mode == SHIP_MODE) {
+        message[2] = clients[message[1]].is_ready;
+        message[3] = clients[battles[clients[message[1]].battle_idx].other(message[1])].is_ready;
+        ptr += 2;
     }
     *ptr = clients[message[1]].can_go;
     ptr++;
+            
+    if (clients[message[1]].can_go) {
+        next_mode(clients[message[1]].mode);
+        cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
+    }
     clients[message[1]].can_go = false;
     return ptr - message;
 }
@@ -256,12 +267,19 @@ int update_net() {
             msg_len = check_query();
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
 
-        } else if (message[0] == MSG_GO) {
+        } else if (message[0] == MSG_READY) {
             message[0] = OK;
-            message[2] = clients[message[1]].can_go;
-            if (clients[message[1]].can_go) {
-                next_mode(clients[message[1]].mode);
-                cout << "client №" << (int)message[1] << " changed mode to " << clients[message[1]].mode << '\n';
+            switch (clients[message[1]].mode) {
+              case INIT_MODE:
+                clients[message[1]].is_ready ^= 1;
+                break;
+              case SHIP_MODE:
+                if (clients[message[1]].is_ready) {
+                    clients[message[1]].is_ready = false;
+                } else {
+                    clients[message[1]].is_ready = clients[message[1]].field_correct;
+                }
+                break;
             }
             sendto(local_udp_socket, message, 3, 0, (sockaddr *)&src_addr, addrlen);
 
