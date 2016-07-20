@@ -41,6 +41,7 @@ float candidates_color[] = {0, 0, 0, 0.4,
                             0.1, 0.7, 0.1, 0.8
                             };
 float bomb_color[] = {0.7, 0, 0, 1}, aqua_color[] = {0, 0.4, 0.8, 1};
+float no_color[] = {0.5, 0, 0, 0.5}, yes_color[] = {0, 0.2, 0.9, 0.5};
 string name;
 bool bombs_removed, window_should_close = false, play_audio = true, check_result = true, me_ready;
 int fps_counter;
@@ -245,13 +246,7 @@ static void update_all() {
         cout << "go_allowed" << endl;
         begin_switch_mode = curr_time;
         go_pressed = go_allowed = 0;
-        need_next_mode = true;
-        active_buttons = false;
-    }
-    if (need_next_mode and SWITCH_DUR - (curr_time - begin_switch_mode) < EPS) {
         next_mode();
-        need_next_mode = false;
-        active_buttons = true;
     }
 
     if (mode == SHIP_MODE) {
@@ -282,8 +277,23 @@ static void RenderSceneCB()
         last_fps_update = curr_time;
         fps_counter = 0;
     }
-    
-    if (mode != INIT_MODE) {
+    switch (mode) {
+      case INIT_MODE:
+        draw_candidates();
+        break;
+      case SHIP_MODE:
+        draw_field(field1);
+        
+        for (int i = 0; i < amount_of_ships; i++) {
+            if (i != curr_ship)
+            draw_ship(i, ship_color + 4 * colorscheme);
+        }
+        draw_bombs(field1);
+        if (curr_ship != -1) {
+            draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
+        }
+        break;
+      case BATTLE_MODE:
         draw_field(field1);
         draw_field(field2);
         
@@ -293,11 +303,7 @@ static void RenderSceneCB()
         }
         draw_bombs(field1);
         draw_bombs(field2);
-        if (curr_ship != -1) {
-            draw_ship(curr_ship, current_ship_color + 4 * colorscheme);
-        }
-    } else {
-        draw_candidates();
+        break;
     }
     draw_buttons();
 

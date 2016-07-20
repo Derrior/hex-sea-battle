@@ -30,6 +30,7 @@ int update_all() {
             clients[best_o].is_ready = clients[i].is_ready = false;
 
             battles.push_back(battle(i, best_o));
+            clients[i].battle_idx = clients[best_o].battle_idx = battles.back().idx;
         } else if (clients[best_o].best_opponent != i) {
             clients[i].is_ready = clients[i].can_go = false;
         }
@@ -55,8 +56,15 @@ int main()
     create_field_vbo();
     cout << "created" << endl;
     init_net();
+    long double last_fps_time = 0;
+    int fps_counter = 0;
     while (1) {
-        curr_time = time(NULL);
+        curr_time = (long double)clock() / CLOCKS_PER_SEC;
+        fps_counter++;
+        if (curr_time - last_fps_time > 1) {
+            cout << "fps: " << fps_counter << endl;
+            last_fps_time = curr_time;
+        }
         update_net();
         update_all();
     }

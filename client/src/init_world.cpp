@@ -81,7 +81,7 @@ void init_buttons() {
     mode = INIT_MODE;
     buttons.resize(3);
     buttons[0].resize(1);
-    buttons[0][0] = button(100, 670, "Go", 1.5);
+    buttons[0][0] = button(100, 200, "Go", 1.5);
     buttons[0][0].register_callback([](){
         go_pressed = true;
     });

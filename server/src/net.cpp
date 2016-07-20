@@ -168,6 +168,7 @@ int update_query() {
     if (clients[message[1]].mode == INIT_MODE) {
         message[2] = 0;
         ptr++;
+        int best_o = clients[message[1]].best_opponent;
         
         for (int i = 0; i < 128; i++) {
             if (i == message[1] or is_unused_number[i] or clients[i].mode != INIT_MODE) {
@@ -178,7 +179,7 @@ int update_query() {
             memcpy(ptr + 1, clients[i].name, *ptr);
             ptr += (*ptr) + 1;
             *ptr = 0;
-            bool cond1 = clients[i].best_opponent == message[1], cond2 = clients[message[1]].best_opponent == i;
+            bool cond1 = clients[i].best_opponent == message[1], cond2 = best_o == i;
             if (cond1 and cond2) {
                 *ptr = 3;
             } else if (cond1) {
@@ -188,6 +189,9 @@ int update_query() {
             }
             ptr++;
         }
+        ptr[0] = clients[message[1]].is_ready;
+        ptr[1] = clients[best_o].best_opponent == message[1] and clients[best_o].is_ready;
+        ptr += 2;
     } else if (clients[message[1]].mode == SHIP_MODE) {
         message[2] = clients[message[1]].is_ready;
         message[3] = clients[battles[clients[message[1]].battle_idx].other(message[1])].is_ready;

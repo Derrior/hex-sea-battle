@@ -5,7 +5,7 @@
 #include <ship.h>
 #include <iostream>
 
-#define SWITCH_DUR 0.5
+#define SWITCH_DUR 0.1
 
 #define INIT_MODE 0
 #define SHIP_MODE 1

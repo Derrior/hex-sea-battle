@@ -191,11 +191,12 @@ void draw_rect(int x, int y, float* color) {
 }
 
 void draw_name() {
-    draw_rect(200, 600, candidates_color);
+    int y_coord =  WINDOW_HEIGHT - 70;
+    draw_rect(200, y_coord, candidates_color);
 
-    draw_text(point(200 - 7 * name.length(), 600 - 7), name, 1);
-    draw_rect(WINDOW_WIDTH / 2 - 100, 600, me_ready ? aqua_color : bomb_color);
-    draw_rect(WINDOW_WIDTH / 2 + 100, 600, opponent.is_ready ? aqua_color : bomb_color);
+    draw_text(point(200 - 7 * name.length(), y_coord - 7), name, 1);
+    draw_rect(WINDOW_WIDTH / 2 - 100, y_coord + 20, me_ready ? yes_color : no_color);
+    draw_rect(WINDOW_WIDTH / 2 + 100, y_coord + 20, opponent.is_ready ? yes_color : no_color);
 }
 
 

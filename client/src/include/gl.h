@@ -41,7 +41,7 @@ extern int mouse_x, mouse_y;
 extern float field_color[], white_color[], black_color[];
 extern float ship_color[], current_ship_color[];
 extern float candidates_color[];
-extern float bomb_color[], aqua_color[];
+extern float bomb_color[], aqua_color[], no_color[], yes_color[];
 extern int colorscheme;
 extern GLuint tex_a[128];
 extern background bg;

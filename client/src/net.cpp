@@ -206,6 +206,12 @@ int update_query() {
 
     if (mode == INIT_MODE) {
         candidates.resize(message[2]);
+        /*debug
+        for (int i = 2; i < msg_len; i++) {
+            cout << message[i] << ' ';
+        }
+        cout << endl;
+        */
         char* ptr = message + 3;
         for (int i = 0; i < (int)candidates.size(); i++) {
             memcpy(candidates[i].name, ptr + 1, *ptr);
@@ -215,7 +221,13 @@ int update_query() {
             candidates[i].want_to_play = *ptr;
             ptr++;
         }
+        me_ready = ptr[0];
+        opponent.is_ready = ptr[1];
+        ptr += 2;
         go_allowed = *ptr;
+        
+        ptr++;
+
     } else if (mode == SHIP_MODE) {
         me_ready = message[2];
         opponent.is_ready = message[3];
