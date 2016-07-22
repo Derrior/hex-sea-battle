@@ -14,6 +14,7 @@ struct field {
     std::vector<int> aqua;
     bool* used;
     int* containing;
+    int size;
     field() {
         used = NULL;
     }
@@ -22,8 +23,10 @@ struct field {
         used = new bool[am];
         containing = new int[am];
         memset(used, 0, am);
+        size = am;
     }
     void use_cell(int cell_idx);
+    void use_all_cells();
     int contain_ship(int cell_idx);
     char* print_field(char* msg); 
     char* write_field(char* msg); 

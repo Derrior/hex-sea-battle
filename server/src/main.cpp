@@ -41,6 +41,10 @@ int update_all() {
             battles[i].set_can_go(true);
             battles[i].set_is_ready(false);
         }
+        if (!clients[battles[i].client[0]].has_ship() or !clients[battles[i].client[1]].has_ship()) {
+            clients[battles[i].client[0]].F.use_all_cells();
+            clients[battles[i].client[1]].F.use_all_cells();
+        }
 
     }
     return 0;

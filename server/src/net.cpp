@@ -120,6 +120,15 @@ void client_t::fill_in(char *src) {
     }
 }
 
+bool client_t::has_ship() {
+    for (int i = 0; i < amount_of_ships; i++) {
+        if (ships[i].health > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 char message[BUFF_LEN];
 

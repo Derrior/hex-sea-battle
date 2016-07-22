@@ -35,6 +35,7 @@ struct client_t {
     client_t(int n);
     client_t(int n, int battle);
     void fill_in(char *src);
+    bool has_ship();
 };
 
 
