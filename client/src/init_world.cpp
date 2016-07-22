@@ -57,7 +57,6 @@ void init_fields() {
     field2 = field(amount_of_polygons);
     field1.move.m[2] = field1.move.m[5] = field2.move.m[5] = 40;
     field2.move.m[2] = 700;
-    field1.bombs.push_back(19);
 }
 
 void init_audio() {

@@ -3,11 +3,8 @@
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <background.h>
-#include <init_world.h>
 #include <math_3d.h>
 #include <polygon.h>
-#include <button.h>
 #include <battle.h>
 #include <iostream>
 #include <engine.h>

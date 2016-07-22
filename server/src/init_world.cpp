@@ -1,4 +1,5 @@
 #include <init_world.h>
+#include <field.h>
 #include <ctime>
 #include <gl.h>
 using namespace std;

@@ -26,8 +26,8 @@ background::background() {
     arr.resize(400);
     for (int i = 0; i < 400; i++) {
         arr[i] = F[i];
-        arr[i].centre.x -= 500;
-        arr[i].centre.y -= 500;
+        arr[i].centre.x -= 1500;
+        arr[i].centre.y -= 1500;
         color_idx.push_back(get_rand(0, 10));
     }
 }

@@ -6,6 +6,19 @@ using namespace std;
 const float CONST_X = 45 * (CELL_RAD / 29.0);
 const float CONST_Y = 52.1 * (CELL_RAD / 29.0);
 
+void field::use_cell(int cell_idx) {
+    if (containing[cell_idx] >= 0) {
+        bombs.push_back(cell_idx);
+    } else {
+        aqua.push_back(cell_idx);
+    }
+    used[cell_idx] = true;
+}
+
+int field::contain_ship(int cell_idx) {
+    return containing[cell_idx];
+}
+
 char* field::print_field(char* msg) {
     return (char *)memcpy(msg, &move.m[0], sizeof(move)) + sizeof(move);
 }

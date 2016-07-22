@@ -84,28 +84,30 @@ void draw_cell(int cell_idx, const float* color, field& F) {
 }
 
 void draw_cell(int cell_idx) {
-        World.m[2] = bg.arr[cell_idx].centre.x;
-        World.m[5] = bg.arr[cell_idx].centre.y;
-        glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
-        glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
-        glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
-        glUniform4fv(f_color_loc, 1, &colors[bg.color_idx[cell_idx]].c[0]);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
-        glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
+    World.m[2] = bg.arr[cell_idx].centre.x;
+    World.m[5] = bg.arr[cell_idx].centre.y;
+    glUniformMatrix3fv(world_loc, 1, GL_TRUE, &World.m[0]);
+    glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
+    glUniformMatrix2fv(angle_loc, 1, GL_TRUE, &matrixes[0][0]);
+    glUniform4fv(f_color_loc, 1, &colors[bg.color_idx[cell_idx]].c[0]);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship_ibo);
+    glDrawElements(GL_TRIANGLES, SHIP_SIZE, GL_UNSIGNED_INT, 0);
+    glDisableVertexAttribArray(0);
+    char buf[10];
+    sprintf(buf, "%d", cell_idx);
+    //draw_text(point(World.m[2], World.m[5]), buf, 1);
 }
 
 void draw_background() {
-    glUniform1f(scale_loc, BACKGROUND_CELL_RAD);
     Camera.m[2] /= 2;
     Camera.m[5] /= 2;
     glUniformMatrix3fv(camera_loc, 1, GL_TRUE, &Camera.m[0]);
     for (int i = 0; i < (int)bg.arr.size(); i++) {
+        glUniform1f(scale_loc, BACKGROUND_CELL_RAD);
         draw_cell(i);
         
     }

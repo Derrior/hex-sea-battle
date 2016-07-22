@@ -13,14 +13,18 @@ struct field {
     std::vector<int> bombs;
     std::vector<int> aqua;
     bool* used;
+    int* containing;
     field() {
         used = NULL;
     }
 
     field(int am) {
         used = new bool[am];
+        containing = new int[am];
         memset(used, 0, am);
     }
+    void use_cell(int cell_idx);
+    int contain_ship(int cell_idx);
     char* print_field(char* msg); 
     char* write_field(char* msg); 
 };

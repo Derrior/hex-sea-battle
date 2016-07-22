@@ -14,13 +14,12 @@ void create_ships();
 struct ship {
     Matrix3f pos;
     int ibo_size;
-    char strength, rot;
-    bool* is_damaged;
+    char health, rot;
+    char strength;
     ship(int i = 1) {
         rot = 0;
         ibo_size = SHIP_SIZE * i;
-        is_damaged = new bool[i];
-        memset(is_damaged, 0, i);
+        health = i;
 
     }
     void rotate() {
@@ -37,20 +36,16 @@ struct ship {
     }
     void power(int i) {
         ibo_size = SHIP_SIZE * i;
+        health = i;
         strength = i;
-        delete[] is_damaged;
-        is_damaged = new bool[i];
-        memset(is_damaged, 0, i);
+    }
+    void update() {
+        strength = health;
     }
     point get_point(int j);
     bool in_ship(point a);
     bool is_alive() {
-        for (int i = 0; i < strength; i++) {
-            if (!is_damaged[i]) {
-                return true;
-            }
-        }
-        return false;
+        return health > 0;
     }
     char* print_ship(char* msg);
     char* write_ship(char* msg);

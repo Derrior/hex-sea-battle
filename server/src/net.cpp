@@ -42,10 +42,12 @@
 
 #include <net/socket.h>
 #include <net/net.h>
+#include <gl.h>
 #include <string.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <math.h>
+
 #include <iostream>
 #include <vector>
 #include <set>
@@ -64,6 +66,7 @@ using namespace std;
 
 
 client_t::client_t() {
+    F = field(100);
     ships = new ship[amount_of_ships];
     mode = 0;
     alive = 1;
@@ -74,6 +77,7 @@ client_t::client_t() {
 
 
 client_t::client_t(int n) {
+    F = field(100);
     ships = new ship[amount_of_ships];
     mode = 0;
     alive = 1;
@@ -84,6 +88,7 @@ client_t::client_t(int n) {
 }
 
 client_t::client_t(int n, int battle) {
+    F = field(100);
     ships = new ship[amount_of_ships];
     mode = 0;
     alive = 1;
@@ -159,8 +164,65 @@ int check_query() {
     cout << endl;
     */
     return bombs_am + 4;;
-
 }
+
+int shoot_query() {
+    int client_num = message[1];
+    int battle_idx = clients[message[1]].battle_idx;
+    int cell_num = message[2];
+    cout << client_num << ' ' << cell_num << endl;
+    if (!battles[battle_idx].my_turn(client_num) or cell_num < 0 or cell_num >= amount_of_polygons) {
+        message[2] = 0;
+        return 3;
+    }
+    int opponent = battles[battle_idx].other(client_num);
+    if (clients[opponent].F.used[cell_num]) {
+        message[2] = 0;
+        return 3;
+    }
+    int ship_num = clients[opponent].F.contain_ship(cell_num);
+    int bombs_len = clients[opponent].F.bombs.size();
+    int aqua_len = clients[opponent].F.aqua.size();
+        cout << '<' << message[1] << endl;
+    if (ship_num >= 0) {
+        printf("ship#%d: health - %d\n", ship_num, clients[opponent].ships[ship_num].health);
+        clients[opponent].F.use_cell(cell_num);
+        clients[opponent].ships[ship_num].health--;
+        if (!clients[opponent].ships[ship_num].is_alive()) {
+            for (int i = 0; i < amount_of_polygons; i++) {
+                if (clients[opponent].F.contain_ship(i) == ship_num) {
+                    vector<int> neighbours(get_neighbours(i));
+                    for (int neighbour : neighbours) {
+                        if (!clients[opponent].F.used[neighbour]) {
+                            clients[opponent].F.use_cell(neighbour);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        clients[opponent].F.use_cell(cell_num);
+        battles[battle_idx].turn ^= 1;
+    }
+
+    message[2] = 1;
+    message[3] = 0;
+    for (int i = bombs_len; i < clients[opponent].F.bombs.size(); i++) {
+        message[4 + message[3]] = clients[opponent].F.bombs[i];
+        message[3]++;
+    }
+    cout << message[3] << endl;
+    char* ptr = message + 4 + message[3];
+    *ptr = 0;
+    cout << "aqua " << aqua_len << ' ' << clients[opponent].F.aqua.size() << endl;
+    for (int i = aqua_len; i < clients[opponent].F.aqua.size(); i++) {
+        ptr[ptr[0] + 1] = clients[opponent].F.aqua[i];
+        ptr[0]++;
+    }
+    ptr += *ptr + 1;
+    return ptr - message;
+}
+
 int update_query() {
     message[0] = OK;
    
@@ -195,6 +257,10 @@ int update_query() {
     } else if (clients[message[1]].mode == SHIP_MODE) {
         message[2] = clients[message[1]].is_ready;
         message[3] = clients[battles[clients[message[1]].battle_idx].other(message[1])].is_ready;
+        ptr += 2;
+    } else if (clients[message[1]].mode == BATTLE_MODE) {
+        message[2] = battles[clients[message[1]].battle_idx].my_turn(message[1]);
+        message[3] = message[2] ^ 1;
         ptr += 2;
     }
     *ptr = clients[message[1]].can_go;
@@ -290,10 +356,13 @@ int update_net() {
         } else if (message[0] == MSG_SHOT) {
             if (clients[message[1]].mode != BATTLE_MODE) {
                 message[0] = 0;
+                msg_len = 1;
             } else {
                 message[0] = OK;
+                msg_len = shoot_query();
             }
-
+            cout << msg_len << endl;
+            sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
         } else if (message[0] == MSG_UPDATE) {
             clients[message[1]].last_update = curr_time;
             msg_len = update_query();

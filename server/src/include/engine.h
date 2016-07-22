@@ -14,6 +14,8 @@ extern int mode;
 
 int get_cell_idx(point a);
 
+std::vector<int> get_neighbours(int cell_idx);
+
 void get_triangle(int idx, point* &res);
 
 int check(field& r, ship* b);

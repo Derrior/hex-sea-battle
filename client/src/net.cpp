@@ -173,22 +173,29 @@ int shoot_query() {
     sendto(local_udp_socket, message, 3, 0, (sockaddr *)&server, server_addrlen); 
     int msg_len = recvfrom_timeout();
     if (msg_len == -1) {
+        cout << 176 << endl;
         return 1;
     }
     cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
     if (message[0] != OK or message[1] != my_number) {
+        cout << 181 << endl;
         return 1;
     }
     if (message[2]) {
+        printf("message- %d %d %d\n", message[2], message[3], message[4]);
         char* ptr = message + 3;
-        field2.bombs.resize(*ptr);
+        int bombs_len = field2.bombs.size();
+        int aqua_len = field2.aqua.size();
+        field2.bombs.resize(bombs_len + *ptr);
         ptr++;
-        for (int i = 0; i < message[3]; i++, ptr++) {
+        for (int i = bombs_len; i < (int)field2.bombs.size(); i++, ptr++) {
+            cout << i << ' ' << (int)*ptr << endl;
             field2.bombs[i] = *ptr;
         }
-        field2.aqua.resize(*ptr);
+        cout << field2.aqua.size() << endl;
+        field2.aqua.resize(aqua_len + *ptr);
         ptr++;
-        for (int i = 0; i < (int)field2.aqua.size(); i++, ptr++) {
+        for (int i = aqua_len; i < (int)field2.aqua.size(); i++, ptr++) {
             field2.aqua[i] = *ptr;
         }
     }
@@ -233,6 +240,12 @@ int update_query() {
         opponent.is_ready = message[3];
         go_allowed = message[4];
         message[4] = 0;
+    } else {
+        me_ready = message[2];
+        opponent.is_ready = message[3];
+        go_allowed = message[4];
+        message[4] = 0;
+
     }
     return 0;
 }

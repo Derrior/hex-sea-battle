@@ -214,8 +214,21 @@ void PassiveMotionEvent(int x, int y) {
     if (y > WINDOW_HEIGHT * 15 / 16) {
         Camera.m[5] -= CONST_SPEED_CAMERA * (y - 3 * WINDOW_HEIGHT / 4)  / 500;
     }
-    Camera.m[2] = max(-500.0f, Camera.m[2]);
-    Camera.m[5] = max(-500.0f, Camera.m[5]);
+    static int camera_d = 3000;
+    if (fabs(Camera.m[2]) > camera_d) {
+        if (Camera.m[2] > 0) {
+            Camera.m[2] = camera_d;
+        } else {
+            Camera.m[2] = -camera_d;
+        }
+    }
+    if (fabs(Camera.m[5]) > camera_d) {
+        if (Camera.m[5] > 0) {
+            Camera.m[5] = camera_d;
+        } else {
+            Camera.m[5] = -camera_d;
+        }
+    }
     y = 768 - y;
     mouse_x = x;
     mouse_y = y;

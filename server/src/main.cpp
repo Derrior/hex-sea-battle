@@ -1,6 +1,7 @@
-#include <gl.h>
+#include <init_world.h>
 #include <net/net.h>
 #include <ctime>
+#include <gl.h>
 using namespace std;
 
 
@@ -26,19 +27,19 @@ int update_all() {
             continue;
         }
         if (clients[best_o].best_opponent == i and clients[best_o].is_ready and clients[i].is_ready) {
-            clients[best_o].can_go = clients[i].can_go = true;
-            clients[best_o].is_ready = clients[i].is_ready = false;
 
             battles.push_back(battle(i, best_o));
+            battles.back().set_can_go(true);
+            battles.back().set_is_ready(false);
             clients[i].battle_idx = clients[best_o].battle_idx = battles.back().idx;
         } else if (clients[best_o].best_opponent != i) {
             clients[i].is_ready = clients[i].can_go = false;
         }
     }
     for (int i = 0; i < (int)battles.size(); i++) {
-        if (clients[battles[i].client_1].is_ready and clients[battles[i].client_2].is_ready) {
-            clients[battles[i].client_1].can_go = clients[battles[i].client_2].can_go = true;
-            clients[battles[i].client_1].is_ready = clients[battles[i].client_2].is_ready = false;
+        if (battles[i].clients_ready()) {
+            battles[i].set_can_go(true);
+            battles[i].set_is_ready(false);
         }
 
     }
@@ -51,7 +52,6 @@ int main()
     init_matrixes();
     init_ship_object();
     init_fields();
-    init_colors();
     cout << "beforeft" << endl;
     create_field_vbo();
     cout << "created" << endl;

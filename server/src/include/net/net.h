@@ -6,7 +6,6 @@
 #include <battle.h>
 #include <field.h>
 #include <ship.h>
-#include <gl.h>
 #include <set>
 
 

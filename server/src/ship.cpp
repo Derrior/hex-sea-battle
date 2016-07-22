@@ -18,6 +18,7 @@ char * ship::print_ship(char * msg) {
 
 char * ship::write_ship(char * msg) {
     memcpy((void *)&pos.m[0], msg, sizeof(pos) + sizeof(int) + 2 * sizeof(char));
+    update();
     return msg + sizeof(pos) + sizeof(int) + 2 * sizeof(char);
 ;
 }
