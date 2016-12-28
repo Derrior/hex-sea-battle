@@ -19,22 +19,43 @@ int get_cell_idx(point a) {
 vector<int> get_neighbours(int i) {
     cout << i << " : ";
     vector<int> res;
-    if ((i + 1) % 10 != 0) {
-        res.push_back(i + 1);
-        if (i - 9 >= 0)
-            res.push_back(i - 9);
+    if (i %  2 == 0) {
+        if ((i + 1) % 10 != 0) {
+            res.push_back(i + 1);
+            if (i - 9 >= 0)
+                res.push_back(i - 9);
+        }
+        if (i % 10 != 0) {
+            res.push_back(i - 1);
+            if (i - 11 >= 0)
+                res.push_back(i - 11);
+        }
+        if (i + 10 < amount_of_polygons) {
+            res.push_back(i + 10);
+        }
+        if (i - 10 >= 0) {
+            res.push_back(i - 10);
+        }
+    } else {
+        if ((i + 1) % 10 != 0) {
+            res.push_back(i + 1);
+            if (i + 9 < amount_of_polygons)
+                res.push_back(i + 9);
+        }
+        if (i % 10 != 0) {
+            res.push_back(i - 1);
+            if (i + 11 < amount_of_polygons)
+                res.push_back(i + 11);
+        }
+        if (i + 10 < amount_of_polygons) {
+            res.push_back(i + 10);
+        }
+        if (i - 10 >= 0) {
+            res.push_back(i - 10);
+        }
+
     }
-    if (i % 10 != 0) {
-        res.push_back(i - 1);
-        if (i - 11 >= 0)
-            res.push_back(i - 11);
-    }
-    if (i + 10 < amount_of_polygons) {
-        res.push_back(i + 10);
-    }
-    if (i - 10 >= 0) {
-        res.push_back(i - 10);
-    }
+
     for (int c : res) {
         cout << c << ' ';
     }
@@ -42,15 +63,14 @@ vector<int> get_neighbours(int i) {
     return res;
 }
 
-void get_triangle(int idx, point* &res) {
-    res = new point[3];
+void get_triangle(int idx, vector<point> &res) {
+    res.resize(3);
     res[0] = point(ship_vbo_data[ship_ibo_data[idx]][0], ship_vbo_data[ship_ibo_data[idx]][1]);
     res[1] = point(ship_vbo_data[ship_ibo_data[idx + 1]][0], ship_vbo_data[ship_ibo_data[idx + 1]][1]);
     res[2] = point(ship_vbo_data[ship_ibo_data[idx + 2]][0], ship_vbo_data[ship_ibo_data[idx + 2]][1]);
-    return;
 }
 
-int check(field& r, ship* ships) {
+int check(field& r, const vector<ship>& ships_to_check) {
     r.bombs.clear();
     int used[amount_of_polygons];
 
@@ -63,8 +83,8 @@ int check(field& r, ship* ships) {
     int used_cell_am = 0;
     std::cout << "checking begin!\n";
     for (int i = 0; i < amount_of_ships; i++) {
-        for (int j = 0; j < ships[i].strength; j++) {
-            point curr_centre = ships[i].get_point(j);
+        for (int j = 0; j < ships_to_check[i].strength; j++) {
+            point curr_centre = ships_to_check[i].get_point(j);
             curr_centre.x -= r.move.m[2];
             curr_centre.y -= r.move.m[5];
             int k = get_cell_idx(curr_centre);

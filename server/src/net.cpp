@@ -67,7 +67,7 @@ using namespace std;
 
 client_t::client_t() {
     F = field(100);
-    ships = new ship[amount_of_ships];
+    ships.resize(amount_of_ships);
     mode = 0;
     alive = 1;
     memset(name, 0, 128);
@@ -78,7 +78,7 @@ client_t::client_t() {
 
 client_t::client_t(int n) {
     F = field(100);
-    ships = new ship[amount_of_ships];
+    ships.resize(amount_of_ships);
     mode = 0;
     alive = 1;
     num = n;
@@ -89,7 +89,7 @@ client_t::client_t(int n) {
 
 client_t::client_t(int n, int battle) {
     F = field(100);
-    ships = new ship[amount_of_ships];
+    ships.resize(amount_of_ships);
     mode = 0;
     alive = 1;
     num = n;
@@ -98,6 +98,7 @@ client_t::client_t(int n, int battle) {
     can_go = 0;
     best_opponent = -1;
 }
+
 
 void client_t::fill_in(char *src) {
     //char * prev_src = src;
@@ -200,6 +201,7 @@ int shoot_query() {
         if (!clients[opponent].ships[ship_num].is_alive()) {
             for (int i = 0; i < amount_of_polygons; i++) {
                 if (clients[opponent].F.contain_ship(i) == ship_num) {
+                    cerr << "destroyed" << endl;
                     vector<int> neighbours(get_neighbours(i));
                     for (int neighbour : neighbours) {
                         if (!clients[opponent].F.used[neighbour]) {
@@ -344,6 +346,7 @@ int update_net() {
         } else if (message[0] == MSG_CHECK) {
             message[0] = OK;
             msg_len = check_query();
+            cout << '1' << endl;
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
 
         } else if (message[0] == MSG_READY) {
@@ -360,6 +363,7 @@ int update_net() {
                 }
                 break;
             }
+            cout << '2' << endl;
             sendto(local_udp_socket, message, 3, 0, (sockaddr *)&src_addr, addrlen);
 
         } else if (message[0] == MSG_SHOT) {
@@ -375,6 +379,7 @@ int update_net() {
         } else if (message[0] == MSG_UPDATE) {
             clients[message[1]].last_update = curr_time;
             msg_len = update_query();
+            cout << '3' << endl;
             sendto(local_udp_socket, message, msg_len, 0, (sockaddr *)&src_addr, addrlen);
 
         } else if (message[0] == MSG_BOC) {

@@ -1,4 +1,7 @@
+#include <vector>
 #include <geom.h>
+
+using namespace std;
 
 point::point()
 {
@@ -135,7 +138,7 @@ point rotate(const point& centre, const point& p, float angle)
     return centre + vec(centre, p).rotate(angle);
 }
 
-bool in_triangle(point a, point* triangle) {
+bool in_triangle(point a, vector<point> triangle) {
     vec ab(triangle[0], triangle[1]), bc(triangle[1], triangle[2]), ac(triangle[0], triangle[2]);
     return ((ab.cross(vec(triangle[0], a)) * vec(triangle[0], a).cross(ac) > 0 and 
         bc.cross(vec(triangle[1], a)) * vec(triangle[1], a).cross(vec(triangle[1], triangle[0])) > 0)) or a == triangle[0] or a == triangle[1] or a == triangle[2];

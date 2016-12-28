@@ -1,16 +1,17 @@
 #include <init_world.h>
 #include <net/net.h>
+#include <vector>
 #include <ctime>
 #include <gl.h>
 using namespace std;
 
 
-polygon* Field;
 int amount_of_polygons, amount_of_ships, curr_ship;
-ship* ships;
 field field1, field2;
 long double curr_time;
 long long time_last_check;
+vector<polygon> Field;
+vector<ship> ships;
 vector<battle> battles;
 
 int update_all() {

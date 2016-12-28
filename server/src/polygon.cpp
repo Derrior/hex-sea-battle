@@ -1,4 +1,5 @@
 #include <geom.h>
+#include <vector>
 #include <polygon.h>
 
 using namespace std;
@@ -21,7 +22,7 @@ bool in_polygon(point a, polygon& b) {
 
     for (int l = 0; l < b.points.size(); l++) {
         int r = (l + 1) % b.points.size();
-        point triangle[] = {b.centre, b.points[l], b.points[r]};
+        vector<point> triangle = {b.centre, b.points[l], b.points[r]};
         if (in_triangle(a, triangle))
             return true;
     }

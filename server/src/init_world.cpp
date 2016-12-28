@@ -25,7 +25,7 @@ void set_ship(int& x, int& y, field& F) {
 void create_field_vbo() {
 
     float points[7 * amount_of_polygons][4];
-    vector<int> ibo;
+    vector<unsigned int> ibo;
     for (int i = 0; i < amount_of_polygons; i++)
     {
         draw_polygon(Field[i], points, i * 7, ibo);

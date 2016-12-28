@@ -2,6 +2,7 @@
 #define GEOM
 
 #include <math.h>
+#include <vector>
 #include <iostream>
 #ifndef M_PI
 #define M_PI 3.1415
@@ -57,7 +58,7 @@ point operator- (const point&a, const vec& move);
 
 point rotate(const point& centre, const point& p, float angle);
 
-bool in_triangle(point a, point* triangle);
+bool in_triangle(point a, std::vector<point> triangle);
 
 float distance(const point& a, const point& b);
 

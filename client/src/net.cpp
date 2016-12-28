@@ -143,7 +143,7 @@ int check_query() {
     if (msg_len == -1) {
         return 1;
     }
-    cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
+    //cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
     if (message[0] != OK or message[1] != my_number) {
         return 1;
     }
@@ -173,12 +173,11 @@ int shoot_query() {
     sendto(local_udp_socket, message, 3, 0, (sockaddr *)&server, server_addrlen); 
     int msg_len = recvfrom_timeout();
     if (msg_len == -1) {
-        cout << 176 << endl;
         return 1;
     }
-    cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
+    //cout << (int)message[0] << ' ' << (int)message[1] << ' ' << (int)my_number << endl;
     if (message[0] != OK or message[1] != my_number) {
-        cout << 181 << endl;
+        //cerr << 181 << endl;
         return 1;
     }
     if (message[2]) {
@@ -189,10 +188,10 @@ int shoot_query() {
         field2.bombs.resize(bombs_len + *ptr);
         ptr++;
         for (int i = bombs_len; i < (int)field2.bombs.size(); i++, ptr++) {
-            cout << i << ' ' << (int)*ptr << endl;
+            //cerr << i << ' ' << (int)*ptr << endl;
             field2.bombs[i] = *ptr;
         }
-        cout << field2.aqua.size() << endl;
+        //cerr << field2.aqua.size() << endl;
         field2.aqua.resize(aqua_len + *ptr);
         ptr++;
         for (int i = aqua_len; i < (int)field2.aqua.size(); i++, ptr++) {

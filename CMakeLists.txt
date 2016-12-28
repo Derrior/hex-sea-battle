@@ -34,4 +34,3 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -pipe -Wall -Wextra -Wshadow")
 ## Define the executable
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
-target_link_libraries(${PROJECT_NAME} m glew32 freeglut opengl32 freetype sdl2)

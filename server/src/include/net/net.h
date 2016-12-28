@@ -6,6 +6,7 @@
 #include <battle.h>
 #include <field.h>
 #include <ship.h>
+#include <vector>
 #include <set>
 
 
@@ -25,7 +26,7 @@
 
 struct client_t {
     field F;
-    ship* ships;
+    std::vector<ship> ships;
     char name[128];
     long double last_update;
     int num, mode, battle_idx, name_len, best_opponent;
@@ -34,6 +35,7 @@ struct client_t {
     client_t();
     client_t(int n);
     client_t(int n, int battle);
+
     void fill_in(char *src);
     bool has_ship();
 };

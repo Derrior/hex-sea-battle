@@ -1,13 +1,14 @@
 #ifndef FIELD_H_
 #define FIELD_H_
 #include <vector>
+#include <memory>
 #include <polygon.h>
 #include <math_3d.h>
 
-polygon* gen_field(int w, int h, int rad=CELL_RAD);
-polygon* gen_ship(int w);
+std::vector<polygon> gen_field(int w, int h, int rad=CELL_RAD);
+std::vector<polygon> gen_ship(int w);
 void to_float(float arr[][4], int& idx, point c);
-void draw_polygon(polygon& p, float vbo_data[][4], int idx, std::vector<int>& ibo);
+void draw_polygon(polygon& p, float vbo_data[][4], int idx, std::vector<unsigned int>& ibo);
 struct field {
     Matrix3f move;
     std::vector<int> bombs;
@@ -24,6 +25,11 @@ struct field {
         containing = new int[am];
         memset(used, 0, am);
         size = am;
+    }
+
+    ~field() {
+        delete[] used;
+        delete[] containing;
     }
     void use_cell(int cell_idx);
     void use_all_cells();

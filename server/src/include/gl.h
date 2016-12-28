@@ -9,6 +9,7 @@
 #include <iostream>
 #include <engine.h>
 #include <field.h>
+#include <vector>
 #include <geom.h>
 #include <cstdio>
 #include <file.h>
@@ -19,9 +20,9 @@
 #define AMOUNT_COLORSCHEMES 4
 
 extern long double curr_time;
-extern polygon* Field;
+extern std::vector<polygon> Field;
 extern int amount_of_polygons, amount_of_ships, curr_ship;
-extern ship* ships;
+extern std::vector<ship> ships;
 extern field field1, field2;
 extern long long time_last_check;
 extern std::vector<battle> battles;

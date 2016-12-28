@@ -3,14 +3,18 @@
 
 #include <math_3d.h>
 #include <geom.h>
+#include <memory>
+#include <vector>
+
 #define SHIP_SIZE 18
 extern unsigned int ship_vbo, ship_ibo, ship_ibo_size;
 extern float ship_vbo_data[35][4];
-extern unsigned int* ship_ibo_data;
+extern std::vector<unsigned int> ship_ibo_data;
 extern float matrixes[6][4];
 
 void init_ship_object();
 void create_ships();
+
 struct ship {
     Matrix3f pos;
     int ibo_size;
@@ -42,12 +46,12 @@ struct ship {
     void update() {
         strength = health;
     }
-    point get_point(int j);
-    bool in_ship(point a);
-    bool is_alive() {
+    point get_point(int j) const;
+    bool in_ship(point a) const;
+    bool is_alive() const {
         return health > 0;
     }
-    char* print_ship(char* msg);
+    char* print_ship(char* msg) const;
     char* write_ship(char* msg);
 
 };

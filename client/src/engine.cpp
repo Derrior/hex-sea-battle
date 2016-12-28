@@ -81,8 +81,6 @@ bool turn(int x, int y, field& r, ship* b) {
                                 }
                             }
                         }
-                                    
-                        
                     }
                     delete[] tr;
                     return false;
